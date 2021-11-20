@@ -4,8 +4,8 @@ SHELL = true
 
 CC = gcc
 CD = -g
-CFLAG = -Wall -Wextra -Werror -std=c18 -pedantic
-#CFLAG = 
+CFLAG = -Wall -Wextra -std=c18 -pedantic
+#CFLAG = -Wall -Wextra -Werror -std=c18 -pedantic
 EXEC = bin/Chess
 
 SRC = $(wildcard src/*.c)
