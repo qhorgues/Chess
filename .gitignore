@@ -3,6 +3,9 @@
 
 # Object files
 *.o
+*.ico
+!/src/Icone/Icone.o
+*.rc
 *.ko
 *.obj
 *.elf
@@ -50,3 +53,6 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+*.json
+sdl2-config
