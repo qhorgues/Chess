@@ -80,7 +80,7 @@ void reset_grid(struct Piece (*restrict grid)[SIZE_BOARD])
 /**
  * @brief Initailise la structure board
  * 
- * @return struct Board 
+ * @return La structure board initialise
  */
 struct Board Init_Board(void)
 {
