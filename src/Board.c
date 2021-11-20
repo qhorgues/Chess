@@ -53,8 +53,10 @@ static inline void pos_piece(struct Piece (*restrict grid)[SIZE_BOARD], const en
             grid[i][j].value = value;
             if (j <= 1)
                 grid[i][j].color = -1;
-            else
+            else if (j >= 6)
                 grid[i][j].color = 1;
+            else
+                grid[i][j].color = 0;
             grid[i][j].prise_pass = 0;
             grid[i][j].moved = 0;
         }

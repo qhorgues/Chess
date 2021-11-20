@@ -6,13 +6,13 @@
 
 enum type_piece
 {
-    None,
-    Pawn,
-    Bishop,
-    Knight,
-    Rook,
-    Queen,
-    King
+    None = 32,
+    Pawn = 80,
+    Bishop = 66,
+    Knight = 78,
+    Rook = 82,
+    Queen = 81,
+    King = 75
 };
 
 enum value_piece 

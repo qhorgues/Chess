@@ -27,7 +27,8 @@ endif
 all  : $(EXEC)
 
 #Liste des dependances de chaque fichiers
-main.o : main.c
+main.o : main.c Board.h
+Board.o : Board.c Board.h
 
 %.o : %.c
 	$(CC) $(CD) $(CFLAG) -o $@ -c $< $(CLIB)
