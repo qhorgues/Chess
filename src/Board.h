@@ -4,7 +4,7 @@
 #include <stdint.h>
 #define SIZE_BOARD 8
 
-enum type_piece
+enum Type_piece
 {
     None = 32,
     Pawn = 80,
@@ -15,7 +15,7 @@ enum type_piece
     King = 75
 };
 
-enum value_piece 
+enum Value_piece 
 {
     Val_None = 0,
     Val_Pawn = 1,
@@ -28,8 +28,8 @@ enum value_piece
 
 struct Piece
 {
-    enum type_piece type;
-    enum value_piece value;
+    enum Type_piece type;
+    enum Value_piece value;
     int8_t color;
     _Bool prise_pass;
     _Bool moved;
@@ -41,9 +41,16 @@ struct Board
     struct Piece grid[SIZE_BOARD][SIZE_BOARD];
     const uint8_t mailbox_64[64];
     const int8_t mailbox_120[120];
+    struct Piece eliminate_white[15];
+    struct Piece eliminate_black[15];
+    size_t nb_white_eliminate;
+    size_t nb_black_eliminate;
+
 };
 
 extern void reset_grid(struct Piece (*restrict grid)[SIZE_BOARD]);
-struct Board Init_Board(void);
+extern struct Board Init_Board(void);
+extern void move(struct Board *restrict board, const int x_dpt, const int y_dpt, const int x_arv, const int y_arv);
+int print_board(const struct Board *restrict board, FILE *restrict out);
 
 #endif

@@ -1,5 +1,7 @@
-// #include <stdio.h>
+#include <stdio.h>
+#include <assert.h>
 #include "Board.h"
+#include "except.h"
 
 #define MAILBOX_64                          \
     {                                       \
@@ -29,6 +31,7 @@
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1  \
     }
 
+#define OFF_SET(x, y) (y*SIZE_BOARD+x)
 
 /**
  * @brief Construit toutes les pieces d'un type sur la grille
@@ -43,22 +46,22 @@
  * @param[in] max_j La fin du positionement en Y
  * @param[in] increase_j L'ecart de positionement entre les pieces en Y
  */
-static inline void pos_piece(struct Piece (*restrict grid)[SIZE_BOARD], const enum type_piece type, const enum value_piece value, const int min_i, const int max_i, const int increase_i, const int min_j, const int max_j, const int increase_j)
+static inline void pos_piece(struct Piece (*restrict grid)[SIZE_BOARD], const enum Type_piece type, const enum Value_piece value, const int min_i, const int max_i, const int increase_i, const int min_j, const int max_j, const int increase_j)
 {
     for (int i = min_i; i < max_i; i+=increase_i)
     {
         for (int j = min_j; j < max_j; j+=increase_j)
         {
-            grid[i][j].type = type;
-            grid[i][j].value = value;
+            grid[j][i].type = type;
+            grid[j][i].value = value;
             if (j <= 1)
-                grid[i][j].color = -1;
+                grid[j][i].color = -1;
             else if (j >= 6)
-                grid[i][j].color = 1;
+                grid[j][i].color = 1;
             else
-                grid[i][j].color = 0;
-            grid[i][j].prise_pass = 0;
-            grid[i][j].moved = 0;
+                grid[j][i].color = 0;
+            grid[j][i].prise_pass = 0;
+            grid[j][i].moved = 0;
         }
     }
 }
@@ -86,7 +89,60 @@ void reset_grid(struct Piece (*restrict grid)[SIZE_BOARD])
  */
 struct Board Init_Board(void)
 {
-    struct Board board = {.mailbox_64=MAILBOX_64, .mailbox_120= MAILBOX_120};
+    struct Board board = {.mailbox_64=MAILBOX_64, .mailbox_120= MAILBOX_120, .nb_white_eliminate = 0, .nb_black_eliminate = 0};
     reset_grid(board.grid);
     return board;
+}
+
+void move(struct Board *restrict board, const int x_dpt, const int y_dpt, const int x_arv, const int y_arv)
+{
+    assert(x_dpt >= 0 && x_dpt < SIZE_BOARD && "Starting x-coordinate outside the grid");
+    assert(y_dpt >= 0 && y_dpt < SIZE_BOARD && "Starting y-coordinate outside the grid");
+    assert(x_arv >= 0 && x_arv < SIZE_BOARD && "Ending x-coordinate outside the grid");
+    assert(y_arv >= 0 && y_arv < SIZE_BOARD && "Ending y-coordinate outside the grid");
+    assert(board != NULL && "The board structure cannot be NULL");
+    
+    if (board->grid[y_arv][x_arv].color == 1)
+    {
+        board->eliminate_white[board->nb_white_eliminate] = board->grid[y_arv][x_arv];
+        board->nb_white_eliminate++;
+    }
+    else if (board->grid[y_arv][x_arv].color == -1)
+    {
+        board->eliminate_black[board->nb_black_eliminate] = board->grid[y_arv][x_arv];
+        board->nb_black_eliminate++;
+    }
+    board->grid[y_arv][x_arv] = board->grid[y_dpt][x_dpt];
+    board->grid[y_dpt][x_dpt] = (struct Piece){.color = 0, .type = None, .value = Val_None, .prise_pass = 0, .moved = 0};
+}
+
+static inline char player_color(const int player)
+{
+    if (player == 1)
+        return 'W';
+    else if (player == -1)
+        return 'B';
+    return ' ';
+}
+
+/**
+ * @brief 
+ * 
+ * @param board La structure board du plateau du jeu
+ * @param out La sortie ou ecrire le plateau
+ * @return int retoure en cas d'erreur -1 sinon 0
+ * 
+ * @exception fprintf
+ */
+int print_board(const struct Board *restrict board, FILE *restrict out)
+{
+    for (int i = 0; i < SIZE_BOARD; i++)
+    {
+        for (int j = 0; j < SIZE_BOARD; j++)
+        {
+            fprintf( out, " %c%c ", player_color(board->grid[i][j].color), board->grid[i][j].type);
+            return_except(-1);
+        }
+        fputc('\n', out);
+    }
 }

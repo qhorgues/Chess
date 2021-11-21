@@ -27,11 +27,12 @@ endif
 all  : $(EXEC)
 
 #Liste des dependances de chaque fichiers
-main.o : main.c Board.h
-Board.o : Board.c Board.h
+src/main.o : src/main.c src/Board.h
+src/Board.o : src/Board.c src/Board.h
 
 %.o : %.c
 	$(CC) $(CD) $(CFLAG) -o $@ -c $< $(CLIB)
 
 $(EXEC) : $(OBJ)
 	$(CC) $(CD) $(CFLAG) -o $@ $^ $(ICO) $(CLIB) $(SHELL)
+
