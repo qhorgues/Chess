@@ -1,17 +1,17 @@
-WINDOW = true
+WINDOWS = true
 SHELL = true
 
 
 CC = gcc
 CD = -g
-CFLAG = -Wall -Wextra -std=c18 -pedantic
-#CFLAG = -Wall -Wextra -Werror -std=c18 -pedantic
+#CFLAG = -Wall -Wextra -std=c18 -pedantic
+CFLAG = -Wall -Wextra -Werror -std=c18 -pedantic
 EXEC = bin/Chess
 
 SRC = $(wildcard src/*.c)
 OBJ = $(SRC:.c=.o)
 
-ifeq ($(WINDOW), true)
+ifeq ($(WINDOWS), true)
 	ICO = src/Icone/Icone.o
 #	CLIB = -L lib -I include -lSDL2main -lSDL2
 	ifeq ($(SHELL), false)
@@ -35,4 +35,3 @@ src/Board.o : src/Board.c src/Board.h
 
 $(EXEC) : $(OBJ)
 	$(CC) $(CD) $(CFLAG) -o $@ $^ $(ICO) $(CLIB) $(SHELL)
-
