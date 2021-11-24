@@ -35,6 +35,8 @@
 
 /**
  * @brief Construit toutes les pieces d'un type sur la grille
+ * @details Permet de construire en serie une meme piece sur une grille
+ * lors de l'INITIALISATION car les couleurs sont determinee en fonction de la position
  * 
  * @param[out] grid Le plateau ou positionner les pieces
  * @param[in] type Le type de la piece
@@ -68,11 +70,17 @@ static inline void pos_piece(struct Piece (*restrict grid)[SIZE_BOARD], const en
 
 /**
  * @brief renvoi la grille de depart au echec
+ * @details Réinitialise la grille en recreen les pieces a leur position initiale au echec
+ * permet ainsi de (re)lancer une partie (La fonction prend en parametre la grille a reiitialiser)
+ * 
  * @param[out] grid Le plateau a (re)initialiser
+ * 
+ * @warning passer une grille de taille inferieur a 8*8 ou un pointeur invalide provoque une erreur
  * 
  */
 void reset_grid(struct Piece (*restrict grid)[SIZE_BOARD])
 {
+    assert(grid != NULL && "The pointer on the grid must not be NULL");
     pos_piece(grid, None, Val_None, 0, 8, 1, 2, 6, 1);
     pos_piece(grid, Pawn, Val_Pawn, 0, 8, 1, 1, 7, 5);
     pos_piece(grid, Rook, Val_Rook, 0, 8, 7, 0, 8, 7);
@@ -94,6 +102,43 @@ struct Board Init_Board(void)
     return board;
 }
 
+/**
+ * @brief Fonction permettant de deplacer une piece entre deux case de l'echequier
+ * @details Fonction testant si les coordonnees sont dans le plateau (assert) et deplace une piece d'une case
+ * a une autre selon les coordonnes (ne teste pas si le mouvement pour la piece choisit est valide) et si le
+ * mouvement tue une piece de l'adversaire, cette piece est ajoute au tableau des pieces perdue de l'adversaire 
+ * 
+ * @param[in, out] board La structure du plateau
+ * @param[in] x_dpt Coordonnee x de depart
+ * @param[in] y_dpt Coordonnee y de depart
+ * @param[in] x_arv Coordonnee x d'arrive
+ * @param[in] y_arv Coordonnee y d'arrive
+ * 
+ * @warning le pointeur sur la structure Board ne doit pas etre invalide
+ * @warning le contenu de la structure board doit etre valide
+ * 
+ * Exemple : 
+ * @code
+ * int main(void)
+ * {
+ *     struct Board board = Init_Board();
+ *     move(&board, 3, 7, 4, 0);
+ *     print_board(&board, stdout);
+ * }
+ * @endcode
+ * renvoi : 
+ * @code
+ *  BR  BN  BB  BQ  WQ  BB  BN  BR 
+ *  BP  BP  BP  BP  BP  BP  BP  BP 
+ *
+ *
+ * 
+ *
+ *  WP  WP  WP  WP  WP  WP  WP  WP
+ *  WR  WN  WB      WK  WB  WN  WR
+ * @endcode
+ * On voit que la dame en D1 (3, 7) est deplace en E8 (4, 0)
+ */
 void move(struct Board *restrict board, const int x_dpt, const int y_dpt, const int x_arv, const int y_arv)
 {
     assert(x_dpt >= 0 && x_dpt < SIZE_BOARD && "Starting x-coordinate outside the grid");
@@ -116,6 +161,13 @@ void move(struct Board *restrict board, const int x_dpt, const int y_dpt, const 
     board->grid[y_dpt][x_dpt] = (struct Piece){.color = 0, .type = None, .value = Val_None, .prise_pass = 0, .moved = 0};
 }
 
+/**
+ * @brief 
+ * @details
+ * 
+ * @param player 
+ * @return char 
+ */
 static inline char player_color(const int player)
 {
     if (player == 1)
@@ -144,5 +196,7 @@ int print_board(const struct Board *restrict board, FILE *restrict out)
             return_except(-1);
         }
         fputc('\n', out);
+        return_except(-1);
     }
+    return 0;
 }
