@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
+#include <stdbool.h>
 #include "Board.h"
 #include "except.h"
 
@@ -62,8 +63,8 @@ static inline void pos_piece(struct Piece (*restrict grid)[SIZE_BOARD], const en
                 grid[j][i].color = 1;
             else
                 grid[j][i].color = 0;
-            grid[j][i].prise_pass = 0;
-            grid[j][i].moved = 0;
+            grid[j][i].prise_pass = false;
+            grid[j][i].moved = false;
         }
     }
 }
@@ -158,7 +159,7 @@ void move(struct Board *restrict board, const int x_dpt, const int y_dpt, const 
         board->nb_black_eliminate++;
     }
     board->grid[y_arv][x_arv] = board->grid[y_dpt][x_dpt];
-    board->grid[y_dpt][x_dpt] = (struct Piece){.color = 0, .type = None, .value = Val_None, .prise_pass = 0, .moved = 0};
+    board->grid[y_dpt][x_dpt] = (struct Piece){.color = 0, .type = None, .value = Val_None, .prise_pass = false, .moved = false};
 }
 
 /**

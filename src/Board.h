@@ -2,6 +2,8 @@
 #define BOARD_H
 
 #include <stdint.h>
+#include <stdio.h>
+#include <stdbool.h>
 #define SIZE_BOARD 8
 
 /**
@@ -48,9 +50,8 @@ struct Piece
     enum Type_piece type;
     enum Value_piece value;
     int8_t color;
-    _Bool prise_pass;
-    _Bool moved;
-
+    bool prise_pass;
+    bool moved;
 };
 
 /**
