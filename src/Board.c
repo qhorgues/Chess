@@ -4,6 +4,11 @@
 #include "Board.h"
 #include "except.h"
 
+/**
+ * @def MAILBOX_64
+ * @brief contient le prototype de la mailbox 64
+ * 
+ */
 #define MAILBOX_64                          \
     {                                       \
         21, 22, 23, 24, 25, 26, 27, 28,     \
@@ -48,8 +53,11 @@
  * @param[in] min_j Le depart du positionement en Y
  * @param[in] max_j La fin du positionement en Y
  * @param[in] increase_j L'ecart de positionement entre les pieces en Y
+ *  
+ * @warning passer une grille de taille inferieur a 8*8 ou un pointeur invalide provoque une erreur
+ * 
  */
-static inline void pos_piece(struct Piece (*restrict grid)[SIZE_BOARD], const enum Type_piece type, const enum Value_piece value, const int min_i, const int max_i, const int increase_i, const int min_j, const int max_j, const int increase_j)
+static void pos_piece(struct Piece (*restrict grid)[SIZE_BOARD], const enum Type_piece type, const enum Value_piece value, const int min_i, const int max_i, const int increase_i, const int min_j, const int max_j, const int increase_j)
 {
     for (int i = min_i; i < max_i; i+=increase_i)
     {
@@ -77,6 +85,13 @@ static inline void pos_piece(struct Piece (*restrict grid)[SIZE_BOARD], const en
  * @param[out] grid Le plateau a (re)initialiser
  * 
  * @warning passer une grille de taille inferieur a 8*8 ou un pointeur invalide provoque une erreur
+ * 
+ * Exemple:
+ * @code
+ * struct Piece grid[SIZE_BOARD][SIZE_BOARD];
+ * reset_grid(grid);
+ * @endcode
+ * Modifie la grille en la reinitialisant au statut de depart d'un plateau d'echec
  * 
  */
 void reset_grid(struct Piece (*restrict grid)[SIZE_BOARD])
@@ -127,7 +142,7 @@ struct Board Init_Board(void)
  *     print_board(&board, stdout);
  * }
  * @endcode
- * renvoi : 
+ * affiche : 
  * @code
  *  BR  BN  BB  BQ  WQ  BB  BN  BR 
  *  BP  BP  BP  BP  BP  BP  BP  BP 
@@ -163,11 +178,11 @@ void move(struct Board *restrict board, const int x_dpt, const int y_dpt, const 
 }
 
 /**
- * @brief 
- * @details
+ * @brief Renvoie la couleur associe au joueur
+ * @details Renvoie la couleur associe au joueur soit W pour l'entree 1 et B pour l'entree -1 
  * 
  * @param player 
- * @return char 
+ * @return La caractrere associe a la couleur du joueur
  */
 static inline char player_color(const int player)
 {
@@ -185,7 +200,7 @@ static inline char player_color(const int player)
  * @param out La sortie ou ecrire le plateau
  * @return int retoure en cas d'erreur -1 sinon 0
  * 
- * @exception fprintf
+ * @exception exception associe a fprintf
  */
 int print_board(const struct Board *restrict board, FILE *restrict out)
 {
