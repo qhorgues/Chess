@@ -25,8 +25,8 @@
     {                                               \
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,     \
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, \
-            -1, 0, 1, 2, 3, 4, 5, 6, 7, -1,         \
-            -1, 8, 9, 10, 11, 12, 13, 14, 15, -1,   \
+            -1,  0,  1,  2,  3,  4,  5,  6,  7, -1, \
+            -1,  8,  9, 10, 11, 12, 13, 14, 15, -1, \
             -1, 16, 17, 18, 19, 20, 21, 22, 23, -1, \
             -1, 24, 25, 26, 27, 28, 29, 30, 31, -1, \
             -1, 32, 33, 34, 35, 36, 37, 38, 39, -1, \
@@ -37,7 +37,14 @@
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1  \
     }
 
-#define OFF_SET(x, y) (y*SIZE_BOARD+x)
+/*
+static inline int off_set(uint8_t const x, uint8_t const y)
+{
+	assert(x <= SIZE_BOARD && "x out of grid");
+	assert(y <= SIZE_BOARD && "y out of grid");
+	return y * SIZE_BOARD + x;
+}
+*/
 
 /**
  * @brief Construit toutes les pieces d'un type sur la grille
@@ -50,14 +57,14 @@
  * @param[in] min_i Le depart du positionement en X
  * @param[in] max_i La fin du positionement en X
  * @param[in] increase_i L'ecart de positionement entre les pieces en X
- * @param[in] min_j Le depart du positionement en Y
+ * @param[in] min_j Le depart du positionement ven Y
  * @param[in] max_j La fin du positionement en Y
  * @param[in] increase_j L'ecart de positionement entre les pieces en Y
  *  
  * @warning passer une grille de taille inferieur a 8*8 ou un pointeur invalide provoque une erreur
  * 
  */
-static void pos_piece(struct Piece (*restrict grid)[SIZE_BOARD], const enum Type_piece type, const enum Value_piece value, const int min_i, const int max_i, const int increase_i, const int min_j, const int max_j, const int increase_j)
+static void pos_piece(struct Piece (*const restrict grid)[SIZE_BOARD], enum const Type_piece type, enum const Value_piece value, int const min_i, int const max_i, int const increase_i, int const min_j, int const max_j, int const increase_j)
 {
     for (int i = min_i; i < max_i; i+=increase_i)
     {
@@ -94,7 +101,7 @@ static void pos_piece(struct Piece (*restrict grid)[SIZE_BOARD], const enum Type
  * Modifie la grille en la reinitialisant au statut de depart d'un plateau d'echec
  * 
  */
-void reset_grid(struct Piece (*restrict grid)[SIZE_BOARD])
+void reset_grid(struct Piece (*const restrict grid)[SIZE_BOARD])
 {
     assert(grid != NULL && "The pointer on the grid must not be NULL");
     pos_piece(grid, None, Val_None, 0, 8, 1, 2, 6, 1);
@@ -124,7 +131,7 @@ struct Board Init_Board(void)
  * a une autre selon les coordonnes (ne teste pas si le mouvement pour la piece choisit est valide) et si le
  * mouvement tue une piece de l'adversaire, cette piece est ajoute au tableau des pieces perdue de l'adversaire 
  * 
- * @param[in, out] board La structure du plateau
+ * @param[in,out] board La structure du plateau
  * @param[in] x_dpt Coordonnee x de depart
  * @param[in] y_dpt Coordonnee y de depart
  * @param[in] x_arv Coordonnee x d'arrive
@@ -155,7 +162,7 @@ struct Board Init_Board(void)
  * @endcode
  * On voit que la dame en D1 (3, 7) est deplace en E8 (4, 0)
  */
-void move(struct Board *restrict board, const int x_dpt, const int y_dpt, const int x_arv, const int y_arv)
+void move(struct Board *const restrict board, int const x_dpt, int const y_dpt, int const x_arv, int const y_arv)
 {
     assert(x_dpt >= 0 && x_dpt < SIZE_BOARD && "Starting x-coordinate outside the grid");
     assert(y_dpt >= 0 && y_dpt < SIZE_BOARD && "Starting y-coordinate outside the grid");
@@ -179,30 +186,44 @@ void move(struct Board *restrict board, const int x_dpt, const int y_dpt, const 
 
 /**
  * @brief Renvoie la couleur associe au joueur
- * @details Renvoie la couleur associe au joueur soit W pour l'entree 1 et B pour l'entree -1 
+ * @details Renvoie la couleur associe au joueur soit 'W' pour l'entree 1 et 'B' pour l'entree -1 sinon ' ' 
  * 
- * @param player 
- * @return La caractrere associe a la couleur du joueur
+ * @param[in] player 
+ * @return La caractrere associe a la couleur du joueur parmis ('B', 'W', ' ')
+ * 
+ * Exemple :
+ * @code
+ * printf("Color : %c, %c, %c...", player_color(1), player_color(-1), player_color(23);
+ * @endcode
+ * affiche
+ * @code
+ * W, B,  ...
+ * @endcode
  */
-static inline char player_color(const int player)
+static inline char player_color(int const player)
 {
     if (player == 1)
+	{
         return 'W';
-    else if (player == -1)
-        return 'B';
-    return ' ';
+	}
+	else if (player == -1)
+	{
+		return 'B';
+	}
+	return ' ';
 }
+
 
 /**
  * @brief 
  * 
- * @param board La structure board du plateau du jeu
- * @param out La sortie ou ecrire le plateau
+ * @param[in] board La structure board du plateau du jeu
+ * @param[out] out La sortie ou ecrire le plateau
  * @return int retoure en cas d'erreur -1 sinon 0
  * 
  * @exception exception associe a fprintf
  */
-int print_board(const struct Board *restrict board, FILE *restrict out)
+int print_board(struct Board const *const restrict board, FILE *const restrict out)
 {
     for (int i = 0; i < SIZE_BOARD; i++)
     {
@@ -215,4 +236,29 @@ int print_board(const struct Board *restrict board, FILE *restrict out)
         return_except(-1);
     }
     return 0;
+}
+
+
+bool move_possible(struct Board const *const restrict board, struct Coor const dpt, struct Coor const arv)
+{
+	assert(dpt.x <= SIZE_BOARD && dpt.y <= SIZE_BOARD && "invalide coordinate dpt");
+	
+	switch (board->grid[dpt.x][dpt.y])
+	{
+	case 'T':
+		break;
+	case 'N':
+		break;
+	case 'B':
+		break;
+	case 'Q':
+		break;
+	case 'K':
+		break;
+	case 'P':
+		break;
+	default:
+		return false;
+	}
+	
 }
