@@ -5,13 +5,15 @@
 
 int main(void)
 {
-	/* struct Board board = Init_Board();
+	struct Board board = Init_Board();
     move(&board, 3, 7, 4, 0);
-    print_board(&board, stdout); */
+    print_board(&board, stdout);
 	
-	struct List_move list = {NULL, (struct Coor){0 ,0}, 0};
-	push_list_move(&list, (struct Coor){2, 3});
-	push_list_move(&list, (struct Coor){3, 4});
+	/* struct List_move list = init_list_move(COOR(0, 0));
+	list.push_back(&list, COOR(2, 3));
+	list.push_back(&list, COOR(3, 4));
+	list.push_back(&list, COOR(7, 3));
+	list.push_back(&list, COOR(2, 4));
 	
 	ptr_list_move ptr_list = list.list_move;
 	while (ptr_list != NULL)
@@ -19,6 +21,6 @@ int main(void)
 		printf("%d/%d\n", ptr_list->coor.x, ptr_list->coor.y);
 		ptr_list = ptr_list->next;
 	}
-	delete_list_move(&list);
+	list.clear(&list); */
     return 0;
 }

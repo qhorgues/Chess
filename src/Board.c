@@ -37,14 +37,23 @@
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1  \
     }
 
-/*
+
 static inline int off_set(uint8_t const x, uint8_t const y)
 {
 	assert(x <= SIZE_BOARD && "x out of grid");
 	assert(y <= SIZE_BOARD && "y out of grid");
 	return y * SIZE_BOARD + x;
 }
-*/
+
+static inline int get_x(uint8_t coor)
+{
+	return coor % SIZE_BOARD;
+
+
+static inline int get_y(uint8_t coor)
+{
+	return coor / SIZE_BOARD;
+}
 
 /**
  * @brief Construit toutes les pieces d'un type sur la grille
@@ -162,12 +171,12 @@ struct Board Init_Board(void)
  * @endcode
  * On voit que la dame en D1 (3, 7) est deplace en E8 (4, 0)
  */
-void move(struct Board *const restrict board, int const x_dpt, int const y_dpt, int const x_arv, int const y_arv)
+void move(struct Board *const restrict board, struct Coor const dpt, struct Coor const arv)
 {
-    assert(x_dpt >= 0 && x_dpt < SIZE_BOARD && "Starting x-coordinate outside the grid");
-    assert(y_dpt >= 0 && y_dpt < SIZE_BOARD && "Starting y-coordinate outside the grid");
-    assert(x_arv >= 0 && x_arv < SIZE_BOARD && "Ending x-coordinate outside the grid");
-    assert(y_arv >= 0 && y_arv < SIZE_BOARD && "Ending y-coordinate outside the grid");
+    assert(dpt.x >= 0 && dpt.x < SIZE_BOARD && "Starting x-coordinate outside the grid");
+    assert(dpt.y >= 0 && dpt.y < SIZE_BOARD && "Starting y-coordinate outside the grid");
+    assert(arv.x >= 0 && arv.x < SIZE_BOARD && "Ending x-coordinate outside the grid");
+    assert(arv.y >= 0 && arv.y < SIZE_BOARD && "Ending y-coordinate outside the grid");
     assert(board != NULL && "The board structure cannot be NULL");
     
     if (board->grid[y_arv][x_arv].color == 1)
@@ -239,14 +248,24 @@ int print_board(struct Board const *const restrict board, FILE *const restrict o
 }
 
 
-/* bool move_possible(struct Board const *const restrict board, struct Coor const dpt, struct Coor const arv)
+List_move list_move(struct Board const *const restrict board, struct Coor const dpt, struct Coor const arv)
 {
 	assert(dpt.x <= SIZE_BOARD && dpt.y <= SIZE_BOARD && "invalide coordinate dpt");
-	
+	list = init_list_move(dpt);
 	switch (board->grid[dpt.x][dpt.y].type)
 	{
 	case 'T':
-		break;
+		int const move_tower[4] = {-10, -1, 1, 10};
+		for (int i = 0; i < 4; i++)
+		{
+			int8_t actu = off_set(dpt.x, dpt.y) + move_tower[i];
+			while (board->grid[get_x(actu)][get_y(actu)].color != board->grid[dpt.x][dpt.y].color && actu + move_tower[i] != -1)
+			{
+				list.push_back(&list, COOR(get_x(actu), get_y(actu));
+				actu += move_tower[i]
+			}
+		}
+		return list;
 	case 'N':
 		break;
 	case 'B':
@@ -261,4 +280,4 @@ int print_board(struct Board const *const restrict board, FILE *const restrict o
 		return false;
 	}
 	
-} */
+}

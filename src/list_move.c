@@ -2,7 +2,7 @@
 #include <assert.h>
 #include "list_move.h"
 
-int push_list_move(List_move *const list, struct Coor coor)
+static int push_back(List_move *const list, struct Coor coor)
 {
 	ptr_list_move new = malloc(sizeof(struct Coor));
 	if (new == NULL)
@@ -26,7 +26,7 @@ int push_list_move(List_move *const list, struct Coor coor)
 	return 0;
 }
 
-void delete_list_move(List_move *const list)
+static void clear(List_move *const list)
 {
 	ptr_list_move next = list->list_move;
 	while (next != NULL) 
@@ -37,5 +37,9 @@ void delete_list_move(List_move *const list)
 	}
 	list->list_move = NULL;
 	list->size = 0;
-}	
+}
 
+List_move init_list_move(struct Coor const dpt)
+{
+	return (List_move){&push_back, &clear, NULL, dpt, 0};
+}
