@@ -6,6 +6,7 @@
 #include <stdbool.h>
  
 #define SIZE_BOARD 8
+#include "coor.h"
 
 /**
  * @enum Type_piece
@@ -35,16 +36,6 @@ enum Value_piece
     Val_Rook = 5,
     Val_Queen = 9,
     Val_King = 255
-};
-
-/**
- * @struct Coor
- * @brief Conserve une coordonnees x et y sur le plateau
- */
-struct Coor
-{
-	uint8_t x;
-	uint8_t y;
 };
 
 /**

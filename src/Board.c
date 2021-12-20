@@ -64,7 +64,7 @@ static inline int off_set(uint8_t const x, uint8_t const y)
  * @warning passer une grille de taille inferieur a 8*8 ou un pointeur invalide provoque une erreur
  * 
  */
-static void pos_piece(struct Piece (*const restrict grid)[SIZE_BOARD], enum const Type_piece type, enum const Value_piece value, int const min_i, int const max_i, int const increase_i, int const min_j, int const max_j, int const increase_j)
+static void pos_piece(struct Piece (*const restrict grid)[SIZE_BOARD], enum Type_piece const type, enum Value_piece const value, int const min_i, int const max_i, int const increase_i, int const min_j, int const max_j, int const increase_j)
 {
     for (int i = min_i; i < max_i; i+=increase_i)
     {
@@ -239,11 +239,11 @@ int print_board(struct Board const *const restrict board, FILE *const restrict o
 }
 
 
-bool move_possible(struct Board const *const restrict board, struct Coor const dpt, struct Coor const arv)
+/* bool move_possible(struct Board const *const restrict board, struct Coor const dpt, struct Coor const arv)
 {
 	assert(dpt.x <= SIZE_BOARD && dpt.y <= SIZE_BOARD && "invalide coordinate dpt");
 	
-	switch (board->grid[dpt.x][dpt.y])
+	switch (board->grid[dpt.x][dpt.y].type)
 	{
 	case 'T':
 		break;
@@ -261,4 +261,4 @@ bool move_possible(struct Board const *const restrict board, struct Coor const d
 		return false;
 	}
 	
-}
+} */
