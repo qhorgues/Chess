@@ -4,7 +4,9 @@
 
 static int push_back(List_move *const list, struct Coor coor)
 {
-	ptr_list_move new = malloc(sizeof(struct Coor));
+	assert(list != NULL && "list cannot be NULL");
+	
+	ptr_list_move new = malloc(sizeof *new);
 	if (new == NULL)
 	{
 		return -1;
