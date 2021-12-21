@@ -48,7 +48,7 @@ static inline int off_set(uint8_t const x, uint8_t const y)
 static inline int get_x(uint8_t coor)
 {
 	return coor % SIZE_BOARD;
-
+}
 
 static inline int get_y(uint8_t coor)
 {
@@ -141,10 +141,8 @@ struct Board Init_Board(void)
  * mouvement tue une piece de l'adversaire, cette piece est ajoute au tableau des pieces perdue de l'adversaire 
  * 
  * @param[in,out] board La structure du plateau
- * @param[in] x_dpt Coordonnee x de depart
- * @param[in] y_dpt Coordonnee y de depart
- * @param[in] x_arv Coordonnee x d'arrive
- * @param[in] y_arv Coordonnee y d'arrive
+ * @param[in] dpt Coordonnee de depart
+ * @param[in] arv Coordonnee d'arrive
  * 
  * @warning le pointeur sur la structure Board ne doit pas etre invalide
  * @warning le contenu de la structure board doit etre valide
@@ -179,18 +177,19 @@ void move(struct Board *const restrict board, struct Coor const dpt, struct Coor
     assert(arv.y >= 0 && arv.y < SIZE_BOARD && "Ending y-coordinate outside the grid");
     assert(board != NULL && "The board structure cannot be NULL");
     
-    if (board->grid[y_arv][x_arv].color == 1)
+    if (board->grid[arv.y][arv.x].color == 1)
     {
-        board->eliminate_white[board->nb_white_eliminate] = board->grid[y_arv][x_arv];
+        board->eliminate_white[board->nb_white_eliminate] = board->grid[arv.y][arv.x];
         board->nb_white_eliminate++;
     }
-    else if (board->grid[y_arv][x_arv].color == -1)
+    else if (board->grid[arv.y][arv.x].color == -1)
     {
-        board->eliminate_black[board->nb_black_eliminate] = board->grid[y_arv][x_arv];
+        board->eliminate_black[board->nb_black_eliminate] = board->grid[arv.y][arv.x];
         board->nb_black_eliminate++;
     }
-    board->grid[y_arv][x_arv] = board->grid[y_dpt][x_dpt];
-    board->grid[y_dpt][x_dpt] = (struct Piece){.color = 0, .type = None, .value = Val_None, .prise_pass = false, .moved = false};
+    board->grid[arv.y][arv.x] = board->grid[dpt.y][dpt.x];
+	board->grid[arv.y][arv.x].moved = true;
+    board->grid[dpt.y][dpt.x] = (struct Piece){.color = 0, .type = None, .value = Val_None, .prise_pass = false, .moved = false};
 }
 
 /**
@@ -247,37 +246,45 @@ int print_board(struct Board const *const restrict board, FILE *const restrict o
     return 0;
 }
 
-
-List_move list_move(struct Board const *const restrict board, struct Coor const dpt, struct Coor const arv)
+static void get_piece_move(struct Board const *const restrict board, List_move *const restrict list, int const *const tab_move, uint8_t const size_tab)
 {
-	assert(dpt.x <= SIZE_BOARD && dpt.y <= SIZE_BOARD && "invalide coordinate dpt");
-	list = init_list_move(dpt);
-	switch (board->grid[dpt.x][dpt.y].type)
+	for (int i = 0; i < size_tab; i++)
 	{
-	case 'T':
-		int const move_tower[4] = {-10, -1, 1, 10};
-		for (int i = 0; i < 4; i++)
+		int8_t actu = board->mailbox_64[off_set(list->dpt.x, list->dpt.y)]+tab_move[i];
+		while (board->mailbox_120[actu] != -1 && board->grid[get_y(board->mailbox_120[actu])][get_x(board->mailbox_120[actu])].color == 0)
 		{
-			int8_t actu = off_set(dpt.x, dpt.y) + move_tower[i];
-			while (board->grid[get_x(actu)][get_y(actu)].color != board->grid[dpt.x][dpt.y].color && actu + move_tower[i] != -1)
-			{
-				list.push_back(&list, COOR(get_x(actu), get_y(actu));
-				actu += move_tower[i]
-			}
+			list->push_back(list, COOR(get_x(board->mailbox_120[actu]), get_y(board->mailbox_120[actu])));
+			actu += tab_move[i];
 		}
-		return list;
-	case 'N':
+		if (board->grid[get_y(board->mailbox_120[actu])][get_x(board->mailbox_120[actu])].color == board->grid[list->dpt.y][list->dpt.x].color * -1)
+		{
+			list->push_back(list, COOR(get_x(board->mailbox_120[actu]), get_y(board->mailbox_120[actu])));
+		}
+	}
+}
+
+void get_list_move(struct Board const *const restrict board, List_move *const restrict list)
+{
+	assert(list->dpt.x < SIZE_BOARD && list->dpt.y < SIZE_BOARD && "invalide coordinate list.dpt");
+	switch (board->grid[list->dpt.y][list->dpt.x].type)
+	{
+	case Rook:;
+		int const move_tower[4] = {-10, -1, 1, 10};
+		get_piece_move(board, list, move_tower, 4);
 		break;
-	case 'B':
+	case Knight:
 		break;
-	case 'Q':
+	case Bishop:
 		break;
-	case 'K':
+	case Queen:;
+		int const move_queen[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
+		get_piece_move(board, list, move_queen, 8);
 		break;
-	case 'P':
+	case King:
+		break;
+	case Pawn:
 		break;
 	default:
-		return false;
+		break;
 	}
-	
 }

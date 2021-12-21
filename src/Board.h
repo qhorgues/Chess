@@ -7,6 +7,7 @@
  
 #define SIZE_BOARD 8
 #include "coor.h"
+#include "List_move.h"
 
 /**
  * @enum Type_piece
@@ -130,7 +131,8 @@ struct Board
 
 extern void reset_grid(struct Piece (*restrict grid)[SIZE_BOARD]);
 extern struct Board Init_Board(void);
-extern void move(struct Board *restrict board, const int x_dpt, const int y_dpt, const int x_arv, const int y_arv);
+extern void move(struct Board *const restrict board, struct Coor const dpt, struct Coor const arv);
 int print_board(const struct Board *restrict board, FILE *restrict out);
+extern void get_list_move(struct Board const *const restrict board, List_move *const restrict list);
 
 #endif
