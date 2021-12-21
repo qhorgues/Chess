@@ -60,3 +60,7 @@ Doc
 CMakeFiles
 cmake_install.cmake
 CMakeCache.txt
+
+move_knight.png
+move_Pawn.png
+move_Queen.png
