@@ -37,22 +37,21 @@
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1  \
     }
 
-
-static inline int off_set(uint8_t const x, uint8_t const y)
+int off_set(uint8_t const x, uint8_t const y)
 {
-	assert(x <= SIZE_BOARD && "x out of grid");
-	assert(y <= SIZE_BOARD && "y out of grid");
-	return y * SIZE_BOARD + x;
+	assert(x <= WEIGHT_BOARD && "x out of grid");
+	assert(y <= WEIGHT_BOARD && "y out of grid");
+	return y * WEIGHT_BOARD + x;
 }
 
-static inline int get_x(uint8_t coor)
+int get_x(uint8_t const coor)
 {
-	return coor % SIZE_BOARD;
+	return coor % WEIGHT_BOARD;
 }
 
-static inline int get_y(uint8_t coor)
+int get_y(uint8_t const coor)
 {
-	return coor / SIZE_BOARD;
+	return coor / WEIGHT_BOARD;
 }
 
 /**
@@ -73,22 +72,22 @@ static inline int get_y(uint8_t coor)
  * @warning passer une grille de taille inferieur a 8*8 ou un pointeur invalide provoque une erreur
  * 
  */
-static void pos_piece(struct Piece (*const restrict grid)[SIZE_BOARD], enum Type_piece const type, enum Value_piece const value, int const min_i, int const max_i, int const increase_i, int const min_j, int const max_j, int const increase_j)
+static void pos_piece(struct Piece (*const restrict grid), enum Type_piece const type, enum Value_piece const value, uint8_t const min_x, uint8_t const max_x, uint8_t const increase_x, uint8_t const min_y, uint8_t const max_y, uint8_t const increase_y)
 {
-    for (int i = min_i; i < max_i; i+=increase_i)
+    for (uint8_t i = min_x; i < max_x; i+=increase_x)
     {
-        for (int j = min_j; j < max_j; j+=increase_j)
+        for (uint8_t j = min_y; j < max_y; j+=increase_y)
         {
-            grid[j][i].type = type;
-            grid[j][i].value = value;
+            grid[off_set(i, j)].type = type;
+            grid[off_set(i, j)].value = value;
             if (j <= 1)
-                grid[j][i].color = -1;
+                grid[off_set(i, j)].color = -1;
             else if (j >= 6)
-                grid[j][i].color = 1;
+                grid[off_set(i, j)].color = 1;
             else
-                grid[j][i].color = 0;
-            grid[j][i].prise_pass = false;
-            grid[j][i].moved = false;
+                grid[off_set(i, j)].color = 0;
+            grid[off_set(i, j)].prise_pass = false;
+            grid[off_set(i, j)].moved = false;
         }
     }
 }
@@ -110,7 +109,7 @@ static void pos_piece(struct Piece (*const restrict grid)[SIZE_BOARD], enum Type
  * Modifie la grille en la reinitialisant au statut de depart d'un plateau d'echec
  * 
  */
-void reset_grid(struct Piece (*const restrict grid)[SIZE_BOARD])
+void reset_grid(struct Piece (*const restrict grid))
 {
     assert(grid != NULL && "The pointer on the grid must not be NULL");
     pos_piece(grid, None, Val_None, 0, 8, 1, 2, 6, 1);
@@ -152,7 +151,7 @@ struct Board Init_Board(void)
  * int main(void)
  * {
  *     struct Board board = Init_Board();
- *     move(&board, 3, 7, 4, 0);
+ *     move(&board, COOR(3, 7), COOR(4, 0));
  *     print_board(&board, stdout);
  * }
  * @endcode
@@ -169,27 +168,25 @@ struct Board Init_Board(void)
  * @endcode
  * On voit que la dame en D1 (3, 7) est deplace en E8 (4, 0)
  */
-void move(struct Board *const restrict board, struct Coor const dpt, struct Coor const arv)
+void move(struct Board *const restrict board, uint8_t const dpt, uint8_t const arv)
 {
-    assert(dpt.x >= 0 && dpt.x < SIZE_BOARD && "Starting x-coordinate outside the grid");
-    assert(dpt.y >= 0 && dpt.y < SIZE_BOARD && "Starting y-coordinate outside the grid");
-    assert(arv.x >= 0 && arv.x < SIZE_BOARD && "Ending x-coordinate outside the grid");
-    assert(arv.y >= 0 && arv.y < SIZE_BOARD && "Ending y-coordinate outside the grid");
+    assert(dpt < SIZE_BOARD && "Starting coordinate outside the grid");
+    assert(arv < SIZE_BOARD && "Ending coordinate outside the grid");
     assert(board != NULL && "The board structure cannot be NULL");
     
-    if (board->grid[arv.y][arv.x].color == 1)
+    if (board->grid[arv].color == 1)
     {
-        board->eliminate_white[board->nb_white_eliminate] = board->grid[arv.y][arv.x];
+        board->eliminate_white[board->nb_white_eliminate] = board->grid[arv];
         board->nb_white_eliminate++;
     }
-    else if (board->grid[arv.y][arv.x].color == -1)
+    else if (board->grid[arv].color == -1)
     {
-        board->eliminate_black[board->nb_black_eliminate] = board->grid[arv.y][arv.x];
+        board->eliminate_black[board->nb_black_eliminate] = board->grid[arv];
         board->nb_black_eliminate++;
     }
-    board->grid[arv.y][arv.x] = board->grid[dpt.y][dpt.x];
-	board->grid[arv.y][arv.x].moved = true;
-    board->grid[dpt.y][dpt.x] = (struct Piece){.color = 0, .type = None, .value = Val_None, .prise_pass = false, .moved = false};
+    board->grid[arv] = board->grid[dpt];
+	board->grid[arv].moved = true;
+    board->grid[dpt] = (struct Piece){.color = 0, .type = None, .value = Val_None, .prise_pass = false, .moved = false};
 }
 
 /**
@@ -233,15 +230,15 @@ static inline char player_color(int const player)
  */
 int print_board(struct Board const *const restrict board, FILE *const restrict out)
 {
-    for (int i = 0; i < SIZE_BOARD; i++)
+    for (uint8_t i = 0; i < SIZE_BOARD; i++)
     {
-        for (int j = 0; j < SIZE_BOARD; j++)
-        {
-            fprintf( out, " %c%c ", player_color(board->grid[i][j].color), board->grid[i][j].type);
-            return_except(-1);
-        }
-        fputc('\n', out);
+        fprintf( out, " %c%c ", player_color(board->grid[i].color), board->grid[i].type);
         return_except(-1);
+		if ( (i+1) % 8 == 0)
+		{
+			fputc('\n', out);
+			return_except(-1);
+		}
     }
     return 0;
 }
@@ -250,23 +247,31 @@ static void get_piece_move(struct Board const *const restrict board, List_move *
 {
 	for (int i = 0; i < size_tab; i++)
 	{
-		int8_t actu = board->mailbox_64[off_set(list->dpt.x, list->dpt.y)]+tab_move[i];
-		while (board->mailbox_120[actu] != -1 && board->grid[get_y(board->mailbox_120[actu])][get_x(board->mailbox_120[actu])].color == 0)
+		int8_t actu = board->mailbox_64[list->dpt]+tab_move[i];
+		while (board->mailbox_120[actu] != -1)
 		{
-			list->push_back(list, COOR(get_x(board->mailbox_120[actu]), get_y(board->mailbox_120[actu])));
-			actu += tab_move[i];
-		}
-		if (board->grid[get_y(board->mailbox_120[actu])][get_x(board->mailbox_120[actu])].color == board->grid[list->dpt.y][list->dpt.x].color * -1)
-		{
-			list->push_back(list, COOR(get_x(board->mailbox_120[actu]), get_y(board->mailbox_120[actu])));
+			if (board->grid[board->mailbox_120[actu]].color == 0)
+			{
+				list->push_back(list, board->mailbox_120[actu]);
+				actu += tab_move[i];
+			}
+			else if (board->grid[board->mailbox_120[actu]].color == board->grid[list->dpt].color * -1)
+			{
+				list->push_back(list, board->mailbox_120[actu]);
+				break;
+			}
+            else
+            {
+                break;
+            }
 		}
 	}
 }
 
 void get_list_move(struct Board const *const restrict board, List_move *const restrict list)
 {
-	assert(list->dpt.x < SIZE_BOARD && list->dpt.y < SIZE_BOARD && "invalide coordinate list.dpt");
-	switch (board->grid[list->dpt.y][list->dpt.x].type)
+	assert(list->dpt < SIZE_BOARD && "invalide coordinate list.dpt");
+	switch (board->grid[list->dpt].type)
 	{
 	case Rook:;
 		int const move_tower[4] = {-10, -1, 1, 10};
@@ -274,7 +279,9 @@ void get_list_move(struct Board const *const restrict board, List_move *const re
 		break;
 	case Knight:
 		break;
-	case Bishop:
+	case Bishop:;
+		int const move_bishop[4] = {-11, -9, 9, 11};
+		get_piece_move(board, list, move_bishop, 4);
 		break;
 	case Queen:;
 		int const move_queen[8] = {-11, -10, -9, -1, 1, 9, 10, 11};

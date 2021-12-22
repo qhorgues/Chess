@@ -5,7 +5,8 @@
 #include <stdio.h>
 #include <stdbool.h>
  
-#define SIZE_BOARD 8
+#define SIZE_BOARD 64
+#define WEIGHT_BOARD 8
 #include "coor.h"
 #include "List_move.h"
 
@@ -70,7 +71,7 @@ struct Board
     /**
      * @brief La grille principale du jeu
     */
-    struct Piece grid[SIZE_BOARD][SIZE_BOARD];
+    struct Piece grid[SIZE_BOARD];
     
     /**
      * @brief La mailbox 64 permettant de localiser la case de depart d'un mouvement sur la mailbox 120
@@ -129,10 +130,13 @@ struct Board
 
 };
 
-extern void reset_grid(struct Piece (*restrict grid)[SIZE_BOARD]);
+extern void reset_grid(struct Piece (*restrict grid));
 extern struct Board Init_Board(void);
-extern void move(struct Board *const restrict board, struct Coor const dpt, struct Coor const arv);
-int print_board(const struct Board *restrict board, FILE *restrict out);
+extern void move(struct Board *const restrict board, uint8_t const dpt, uint8_t const arv);
+extern int print_board(const struct Board *restrict board, FILE *restrict out);
 extern void get_list_move(struct Board const *const restrict board, List_move *const restrict list);
+extern int off_set(uint8_t const x, uint8_t const y);
+extern int get_x(uint8_t const coor);
+extern int get_y(uint8_t const coor);
 
 #endif
