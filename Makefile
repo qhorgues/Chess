@@ -20,7 +20,7 @@ ifeq ($(WINDOWS), true)
 		SHELL = 
 	endif
 else
-	CLIB = `sdl2-config --cflags --libs`
+#	CLIB = `sdl2-config --cflags --libs`
 	SHELL = 
 endif
 
@@ -28,7 +28,7 @@ all  : $(EXEC)
 
 #Liste des dependances de chaque fichiers
 src/main.o : src/main.c src/Board.h
-src/Board.o : src/Board.c src/Board.h
+src/Board.o : src/Board.c src/Board.h src/list_move.h
 
 %.o : %.c
 	$(CC) $(CD) $(CFLAG) -o $@ -c $< $(CLIB)
