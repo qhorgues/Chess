@@ -1,8 +1,9 @@
 #include <malloc.h>
 #include <assert.h>
+#include <stdint.h>
 #include "list_move.h"
 
-static int push_back(List_move *const list, struct Coor coor)
+static int push_back(List_move *const list, uint8_t const coor)
 {
 	assert(list != NULL && "list cannot be NULL");
 	
@@ -41,7 +42,7 @@ static void clear(List_move *const list)
 	list->size = 0;
 }
 
-List_move init_list_move(struct Coor const dpt)
+List_move init_list_move(uint8_t const dpt)
 {
 	return (List_move){&push_back, &clear, NULL, dpt, 0};
 }
