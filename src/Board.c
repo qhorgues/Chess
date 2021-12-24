@@ -36,23 +36,29 @@
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, \
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1  \
     }
+	
+#if !defined(NDEBUG)
 
 int off_set(uint8_t const x, uint8_t const y)
 {
-	assert(x <= WEIGHT_BOARD && "x out of grid");
-	assert(y <= WEIGHT_BOARD && "y out of grid");
-	return y * WEIGHT_BOARD + x;
+	assert(x <= WIDTH_BOARD && "x out of grid");
+	assert(y <= WIDTH_BOARD && "y out of grid");
+	return y * WIDTH_BOARD + x;
 }
 
 int get_x(uint8_t const coor)
 {
-	return coor % WEIGHT_BOARD;
+	assert(coor <= SIZE_BOARD && "coor out of grid");
+	return coor % WIDTH_BOARD;
 }
 
 int get_y(uint8_t const coor)
 {
-	return coor / WEIGHT_BOARD;
+	assert(coor <= SIZE_BOARD && "coor out of grid");
+	return coor / WIDTH_BOARD;
 }
+
+#endif
 
 /**
  * @brief Construit toutes les pieces d'un type sur la grille
@@ -243,7 +249,7 @@ int print_board(struct Board const *const restrict board, FILE *const restrict o
     return 0;
 }
 
-static void get_piece_move(struct Board const *const restrict board, List_move *const restrict list, int const *const tab_move, uint8_t const size_tab)
+static void get_piece_move(struct Board const *const restrict board, List_move *const restrict list, int8_t const *const tab_move, uint8_t const size_tab)
 {
 	for (int i = 0; i < size_tab; i++)
 	{
@@ -272,24 +278,66 @@ void get_list_move(struct Board const *const restrict board, List_move *const re
 {
 	assert(list->dpt < SIZE_BOARD && "invalide coordinate list.dpt");
 	switch (board->grid[list->dpt].type)
-	{
-	case Rook:;
-		int const move_tower[4] = {-10, -1, 1, 10};
+	{                      
+	case Rook:;            
+		int8_t const move_tower[4] = {-10, -1, 1, 10};
 		get_piece_move(board, list, move_tower, 4);
-		break;
-	case Knight:
-		break;
-	case Bishop:;
-		int const move_bishop[4] = {-11, -9, 9, 11};
+		break;             
+	case Knight:;          
+		int8_t const move_knight[8] = {-21, -19, -12, -8, 8, 12, 19, 21};
+		for (int i = 0; i < 8; i++)
+		{                  
+			int8_t const actu = board->mailbox_64[list->dpt]+move_knight[i];
+			if (board->mailbox_120[actu] != -1 && board->grid[board->mailbox_120[actu]].color != board->grid[list->dpt].color)
+			{              
+				list->push_back(list, board->mailbox_120[actu]);
+			}              
+		}                  
+		break;             
+	case Bishop:;          
+		int8_t const move_bishop[4] = {-11, -9, 9, 11};
 		get_piece_move(board, list, move_bishop, 4);
-		break;
-	case Queen:;
-		int const move_queen[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
+		break;             
+	case Queen:;           
+		int8_t const move_queen[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
 		get_piece_move(board, list, move_queen, 8);
-		break;
-	case King:
-		break;
-	case Pawn:
+		break;             
+	case King:;            
+		int8_t const move_king[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
+		for (int i = 0; i < 8; i++)
+		{                  
+			int8_t const actu = board->mailbox_64[list->dpt]+move_king[i];
+			if (board->mailbox_120[actu] != -1 && board->grid[board->mailbox_120[actu]].color != board->grid[list->dpt].color)
+			{              
+				list->push_back(list, board->mailbox_120[actu]);
+			}              
+		}                  
+		break;             
+	case Pawn:;
+		
+		int8_t const color = board->grid[list->dpt].color;
+		uint8_t const dpt = board->mailbox_64[list->dpt];
+		uint8_t const advance = dpt + color*(-10);
+		uint8_t const eat[2] = {board->mailbox_64[list->dpt] + color*(-11), board->mailbox_64[list->dpt] + color*(-9)};
+		if (board->mailbox_120[advance] != -1 && board->grid[board->mailbox_120[advance]].color == 0)
+		{
+			list->push_back(list, board->mailbox_120[advance]);
+			if (board->grid[list->dpt].moved == false && board->grid[board->mailbox_120[advance + color*(-10)]].color == 0)
+			{			
+				list->push_back(list, board->mailbox_120[advance + color*(-10)]);
+			}
+		}
+		for (int i = 0; i < 2; i++)
+		{
+			if (board->mailbox_120[eat[i]] != -1 && board->grid[board->mailbox_120[eat[i]]].color == color*-1)
+			{
+				list->push_back(list, board->mailbox_120[eat[i]]);
+			}
+			else if (board->mailbox_120[eat[i]] != -1 && board->grid[board->mailbox_120[eat[i]]].color == 0 && board->grid[board->mailbox_120[eat[i] + 10*color]].prise_pass == true)
+			{
+				list->push_back(list, board->mailbox_120[eat[i]]);
+			}
+		}
 		break;
 	default:
 		break;
