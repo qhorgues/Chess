@@ -6,9 +6,11 @@
 #include <stdbool.h>
  
 #define SIZE_BOARD 64
-#define WEIGHT_BOARD 8
-#include "coor.h"
+#define WIDTH_BOARD 8
 #include "List_move.h"
+
+
+
 
 /**
  * @enum Type_piece
@@ -135,8 +137,16 @@ extern struct Board Init_Board(void);
 extern void move(struct Board *const restrict board, uint8_t const dpt, uint8_t const arv);
 extern int print_board(const struct Board *restrict board, FILE *restrict out);
 extern void get_list_move(struct Board const *const restrict board, List_move *const restrict list);
-extern int off_set(uint8_t const x, uint8_t const y);
-extern int get_x(uint8_t const coor);
-extern int get_y(uint8_t const coor);
+
+
+#if defined(NDEBUG)
+	#define off_set(x, y) (y * WIDTH_BOARD + x)
+	#define get_x(coor) (coor % WIDTH_BOARD)
+	#define get_y(coor) (coor / WIDTH_BOARD)
+#else
+	extern int off_set(uint8_t const x, uint8_t const y);
+	extern int get_x(uint8_t const coor);
+	extern int get_y(uint8_t const coor);
+#endif
 
 #endif
