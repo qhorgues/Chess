@@ -1,2 +1,2 @@
 # Chess
-Un jeu d'échec en, C
+Un jeu d'échec en C
