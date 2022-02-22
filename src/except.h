@@ -4,24 +4,43 @@
 
 #define EXCEPTION errno
 
-#define throw(ERROR_XXX, return_value) { errno = ERROR_XXX; return return_value; }
+#define throw(ERROR_XXX, return_value) \
+    {                                  \
+        errno = ERROR_XXX;             \
+        return return_value;           \
+    }
 #define NO_VALUE
 
-#define break_try  { errno = 0; break; }
+#define break_try  \
+    {              \
+        errno = 0; \
+        break;     \
+    }
 
 #define try switch (errno)
 
 #define catch case
 
-#define catch_no_except case NO_ERROR: break_try;
+#define catch_no_except \
+    case NO_ERROR:      \
+        break_try;
 
-#define end_try default: errno = 0; break
+#define end_try    \
+    default:       \
+        errno = 0; \
+        break
 
-#define catch_except default
+#define catch_all_except default
 
 #define no_try errno = 0
 
-#define return_except(return_value) { if (errno) { return return_value; } }
+#define return_except(return_value) \
+    {                               \
+        if (errno)                  \
+        {                           \
+            return return_value;    \
+        }                           \
+    }
 
 #define NO_ERROR 0
 #define ERROR_OPERATION_NOT_PERMITTED 1
