@@ -1,23 +1,159 @@
+/**
+ * \~english @file except.h
+ * \~english @author Quentin (quentin.horgues@outlook.fr)
+ * \~english @brief Module to simulate an error handling based on a switch
+ * \~english @version 0.1
+ * \~english @date 2022-02-23
+ * 
+ * \~english example of use by testing an error :
+ * @code
+ * fprintf(stdout, "Hello World");
+ * try
+ * {
+ * catch(ERROR_ILLEGUAL_BYTE_SEQUENCE): // In case a wide character code that does not match a valid character was detected
+ * perror("fprintf");
+ * break;
+ * 
+ * } end_try; // Exit the try IMPORTANT reset EXCEPTION to 0 with end_try;
+ * @endcode
+ * \~english example by retrieving all the exceptions :
+ * @code
+ * fprintf(stdout, "Hello World");
+ * try
+ * {
+ * catch_all_except: // Catch all errors
+ * perror("fprintf");
+ * break;
+ * } end_try;
+ * @endcode
+ * \~english and here is a complete example:
+ * @code 
+ * #include <stdio.h>
+ * #include "except.h"
+ * 
+ * void foo(int a)
+ * {
+ * if (a > 10)
+ * {
+ * throw(ERROR_INVALID_ARGUMENT, NO_VALUE); // throw an invalid argument exception
+ * }
+ * printf("%d\n", a);
+ * return_except
+ * // Code
+ * }
+ * 
+ * int main(void)
+ * {
+ * foo(12);
+ * try
+ * {
+ * catch(ERROR_INVALID_ARGUMENT): // If the error is an invalid argument
+ * perror("Error argument in function f");
+ * break;
+ * catch_all_except: // If this is another error
+ * perror("Error in function f");
+ * break;
+ * end_try;
+ * return 0;
+ * }
+ * @endcode
+ * 
+ * \~english @copyright Copyright (c) 2022 
+ * 
+ * 
+ *
+ * \~french @file except.h
+ * \~french @author Quentin (quentin.horgues@outlook.fr)
+ * \~french @brief Module permettant de simuler une gestion d'erreur basé sur un switch
+ * \~french @version 0.1
+ * \~french @date 2022-02-23
+ * 
+ * \~french exemple d'utilistation en testant une erreur :
+ * @code
+ * fprintf(stdout, "Hello World");
+ * try
+ * {
+ *     catch(ERROR_ILLEGUAL_BYTE_SEQUENCE): // Dans le cas d'un code de caractères larges qui ne correspond pas à un caractère valide a été détecté
+ *          perror("fprintf");
+ *          break;
+ * 
+ * } end_try; // On quitte le try IMPORTANT on réinitialise EXCEPTION à 0 avec end_try;
+ * @endcode
+ * \~french exemple en recuperant toutes les exceptions :
+ * @code
+ * fprintf(stdout, "Hello World");
+ * try
+ * {
+ *     catch_all_except: // On recupere toutes les erreurs
+ *          perror("fprintf");
+ *          break;
+ * } end_try;
+ * @endcode
+ * \~french et voici un exemple complet :
+ * @code 
+ * #include <stdio.h>
+ * #include "except.h"
+ * 
+ * void foo(int a)
+ * {
+ *     if (a > 10)
+ *     {
+ *         throw(ERROR_INVALID_ARGUMENT, NO_VALUE); // On lance une exception d'argument invalide
+ *     }
+ *     printf("%d\n", a);
+ *     return_except
+ *     // Code
+ * }
+ * 
+ * int main(void)
+ * {
+ *     foo(12);
+ *     try
+ *     {
+ *         catch(ERROR_INVALID_ARGUMENT): // Si l'erreur est un argument invalide
+ *             perror("Error argument in function f");
+ *             break;
+ *         catch_all_except: // Si c'est une autre erreur
+ *             perror("Error in function f");
+ *             break;
+ *     } end_try;
+ *     return 0;
+ * }
+ * @endcode
+ * 
+ * \~french @copyright Copyright (c) 2022 * 
+ */
 #ifndef EXCEPT_H
 #define EXCEPT_H
 #include <errno.h>
 
+
+/**
+ * @def EXCEPTION
+ * \~english @brief contains the error code
+ * \~french @brief contient le code d'erreur
+ */
 #define EXCEPTION errno
 
+/**
+ * @def throw
+ * \~english @brief throw une exception 
+ * \~french @brief lance une exception 
+ */
 #define throw(ERROR_XXX, return_value) \
     {                                  \
-        errno = ERROR_XXX;             \
+        EXCEPTION = ERROR_XXX;             \
         return return_value;           \
     }
+
+/**
+ * @def NO_VALUE
+ * \~english @brief Use in the throw/return_except of a function returning void
+ * \~french @brief Utiliser dans le throw/return_except d'une fonction retournant void
+ */
 #define NO_VALUE
 
-#define break_try  \
-    {              \
-        errno = 0; \
-        break;     \
-    }
-
-#define try switch (errno)
+#define try if(EXCEPTION) { switch (EXCEPTION)
 
 #define catch case
 
@@ -26,23 +162,72 @@
         break_try;
 
 #define end_try    \
-    default:       \
-        errno = 0; \
-        break
+    EXCEPTION = 0; \
+    }
 
 #define catch_all_except default
 
-#define no_try errno = 0
+/**
+ * @def no_try
+ * \~english @brief If no test is performed, EXCEPTION is reset to 0
+ * \~french @brief Si aucun teste n'est effectué on reinitialise EXCEPTION a 0
+ */
+#define no_try EXCEPTION = 0
 
+/**
+ * \~english @def return_except
+ * \~english @brief Raises an exception to the calling function
+ * 
+ * \~english In simple use
+ * @code
+ * fprintf("%d\n", 8);
+ * return_except(NO_VALUE);
+ * @endcode
+ * 
+ * \~english @warning It is necessary to perform memory releases before doing a return_except
+ * @code
+ * int* tab_int = malloc(sizeof(int)*8);
+ * return_except(NO_VALUE);
+ * int* tab2 = malloc(sizeof(int)*10);
+ * if (tab2 == NULL)
+ * {
+ * free(tab_int);
+ * return;
+ * }
+ * @endcode
+ * \~english Since we have to free the memory we do the return_except manually
+ * 
+ * 
+ * \~french @def return_except
+ * \~french @brief Remonte une exception a la fonction appelante
+ * 
+ * \~french Dans une utilisation simple
+ * @code
+ * fprintf("%d\n", 8);
+ * return_except(NO_VALUE);
+ * @endcode
+ * 
+ * \~french @warning Il est necessaire de réaliser les liberations memoire avant de faire un return_except
+ * @code
+ * int* tab_int = malloc(sizeof(int)*8);
+ * return_except(NO_VALUE);
+ * int* tab2 = malloc(sizeof(int)*10);
+ * if (tab2 == NULL)
+ * {
+ *     free(tab_int);
+ *     return;
+ * }
+ * @endcode
+ * \~french Vu que l'on doit liberer la memoire on realise le return_except manuelement
+ */
 #define return_except(return_value) \
     {                               \
-        if (errno)                  \
+        if (EXCEPTION)                  \
         {                           \
             return return_value;    \
         }                           \
     }
 
-#define NO_ERROR 0
 #define ERROR_OPERATION_NOT_PERMITTED 1
 #define ERROR_NO_SUCH_FILE_OR_DIRECTORY 2
 #define ERROR_NO_SUCH_PROCESS 3
