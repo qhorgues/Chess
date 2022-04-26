@@ -1,3 +1,14 @@
+/**
+ * @file Board.c
+ * @author Quentin Horgues (you@domain.com)
+ * @brief Diverse foonction de gestion de l'echequier
+ * @version 0.1
+ * @date 2022-02-23
+ * 
+ * @copyright Copyright (c) 2022 par Quentin Horgues
+ * 
+ */
+
 #include <stdio.h>
 #include <assert.h>
 #include <stdbool.h>
@@ -5,9 +16,13 @@
 #include "except.h"
 
 /**
- * @def MAILBOX_64
- * @brief contient le prototype de la mailbox 64
- *
+ * \~english @def MAILBOX_64
+ * \~english @brief contains the prototype of the mailbox 64
+ * \~english @details Mailbox 64 for locating the starting square of a movement on mailbox 120
+ * 
+ * \~french @def MAILBOX_64
+ * \~french @brief contient le prototype de la mailbox 64
+ * \~french @details La mailbox 64 pérméttant de localiser la case de départ d'un mouvement sur la mailbox 120
  */
 #define MAILBOX_64                          \
 	{                                       \
@@ -21,6 +36,15 @@
 			91, 92, 93, 94, 95, 96, 97, 98  \
 	}
 
+/**
+ * \~english @def MAILBOX_120
+ * \~english @brief contains the prototype of the mailbox 120
+ * \~english @brief The mailbox 120 allows you to manage tray overflows during movements
+ * 
+ * \~french @def MAILBOX_120
+ * \~french @brief contient le prototype de la mailbox 120
+ * \~french @details La mailbox 120 permet de gérer les débordements de plateau lors des mouvements
+ */
 #define MAILBOX_120                                 \
 	{                                               \
 		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,     \
@@ -37,22 +61,51 @@
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1  \
 	}
 
-#if !defined(NDEBUG) // En version release les trois fonction sont construite statiquement avec une macro-fonction
+#if !defined(NDEBUG) // In the release version the three functions are built statically with a macro function
 
-int off_set(uint8_t const x, uint8_t const y)
+/**
+ * \~english @brief returns a one-dimensional index from x and y index for an array of size 64 (8*8)
+ * \~english @param x x index
+ * \~english @param y y index
+ * \~english @return int one-dimensional index
+ * 
+ * \~french @brief renvoie un indice unidimensionnelle à partir des indices x et y pour un tableau de taille 64 (8*8)
+ * \~french @param x indice x
+ * \~french @param y indice y
+ * \~french @return int indice unidimensionnelle
+ */
+int offSet(unsigned char const x, unsigned char const y)
 {
 	assert(x <= WIDTH_BOARD && "x out of grid");
 	assert(y <= WIDTH_BOARD && "y out of grid");
 	return y * WIDTH_BOARD + x;
 }
 
-int get_x(uint8_t const coor)
+/**
+ * \~english @brief Apartir d'un indice unidimensionnelle récupere l'indice multidimensionel x pour un tableau de taille 64 (8*8)
+ * \~english @param coor indice unidimensionnelle
+ * \~english @return int indice x
+ * 
+ * \~french @brief Apartir d'un indice unidimensionnelle récupere l'indice multidimensionel x pour un tableau de taille 64 (8*8)
+ * \~french @param coor indice unidimensionnelle
+ * \~french @return int indice x
+ */
+int getX(unsigned char const coor)
 {
 	assert(coor <= SIZE_BOARD && "coor out of grid");
 	return coor % WIDTH_BOARD;
 }
 
-int get_y(uint8_t const coor)
+/**
+ * \~english @brief Apartir d'un indice unidimensionnelle récupere l'indice multidimensionel y pour un tableau de taille 64 (8*8)
+ * \~english @param coor indice unidimensionnelle
+ * \~english @return int indice y
+ * 
+ * \~french @brief Apartir d'un indice unidimensionnelle récupere l'indice multidimensionel y pour un tableau de taille 64 (8*8)
+ * \~french @param coor indice unidimensionnelle
+ * \~french @return int indice y
+ */
+int getY(unsigned char const coor)
 {
 	assert(coor <= SIZE_BOARD && "coor out of grid");
 	return coor / WIDTH_BOARD;
@@ -68,117 +121,122 @@ int get_y(uint8_t const coor)
  * \~english @param[out] grid The board where to position the pieces
  * \~english @param[in] type The type of the piece
  * \~english @param[in] value The value of the part
- * \~english @param[in] min_i The start of the X positioning
- * \~english @param[in] max_i The end of the X-positioning
- * \~english @param[in] increase_i The difference in positioning between the parts in X
- * \~english @param[in] min_j The start of positioning in Y
- * \~english @param[in] max_j The end of the positioning in Y
- * \~english @param[in] increase_j The positional difference between the pieces in Y
+ * \~english @param[in] minI The start of the X positioning
+ * \~english @param[in] maxI The end of the X-positioning
+ * \~english @param[in] increaseI The difference in positioning between the parts in X
+ * \~english @param[in] minJ The start of positioning in Y
+ * \~english @param[in] maxJ The end of the positioning in Y
+ * \~english @param[in] increaseJ The positional difference between the pieces in Y
  *
  * \~english @warning passing a grid size smaller than 8*8 or an invalid pointer causes an error
  *
- * \~french @brief Construit toutes les pieces d'un type sur la grille
- * \~french @details Permet de construire en serie une meme piece sur une grille
- * \~french lors de l'INITIALISATION car les couleurs sont determinee en fonction de la position
+ * \~french @brief Construit toutes les piéces d'un type sur la grille
+ * \~french @details Permet de construire en série une même pièce sur une grille
+ * \~french lors de l'INITIALISATION car les couleurs sont déterminéé en fonction de la position
  *
- * \~french @param[out] grid Le plateau ou positionner les pieces
- * \~french @param[in] type Le type de la piece
- * \~french @param[in] value La valeur de la piece
- * \~french @param[in] min_i Le depart du positionement en X
- * \~french @param[in] max_i La fin du positionement en X
- * \~french @param[in] increase_i L'ecart de positionement entre les pieces en X
- * \~french @param[in] min_j Le depart du positionement ven Y
- * \~french @param[in] max_j La fin du positionement en Y
- * \~french @param[in] increase_j L'ecart de positionement entre les pieces en Y
+ * \~french @param[out] grid Le plateau ou positionner les pièces
+ * \~french @param[in] type Le type de la pièce
+ * \~french @param[in] value La valeur de la pièce
+ * \~french @param[in] minI Le départ du positionement en X
+ * \~french @param[in] maxI La fin du positionement en X
+ * \~french @param[in] increaseI L'ecart de positionement entre les pièces en X
+ * \~french @param[in] minJ Le départ du positionement ven Y
+ * \~french @param[in] maxJ La fin du positionement en Y
+ * \~french @param[in] increaseJ L'ecart de positionement entre les pièces en Y
  *
  * \~french @warning passer une grille de taille inferieur a 8*8 ou un pointeur invalide provoque une erreur
  *
  */
-static void pos_piece(struct Piece(*const restrict grid), enum Type_piece const type, enum Value_piece const value, uint8_t const min_x, uint8_t const max_x, uint8_t const increase_x, uint8_t const min_y, uint8_t const max_y, uint8_t const increase_y)
+static void posPiece(struct Piece *const restrict grid, enum TypePiece const type, enum ValuePiece const value, unsigned char const minX, unsigned char const maxX, unsigned char const increaseX, unsigned char const minY, unsigned char const maxY, unsigned char const increaseY)
 {
-	for (uint8_t i = min_x; i < max_x; i += increase_x)
+	assert(grid != NULL && "grid cannot be NULL");
+	for (unsigned char i = minX; i < maxX; i += increaseX)
 	{
-		for (uint8_t j = min_y; j < max_y; j += increase_y)
+		for (unsigned char j = minY; j < maxY; j += increaseY)
 		{
-			grid[off_set(i, j)].type = type;
-			grid[off_set(i, j)].value = value;
+			grid[offSet(i, j)].type = type;
+			grid[offSet(i, j)].value = value;
 			if (j <= 1)
-				grid[off_set(i, j)].color = -1;
+				grid[offSet(i, j)].color = -1;
 			else if (j >= 6)
-				grid[off_set(i, j)].color = 1;
+				grid[offSet(i, j)].color = 1;
 			else
-				grid[off_set(i, j)].color = 0;
-			grid[off_set(i, j)].prise_pass = false;
-			grid[off_set(i, j)].moved = false;
+				grid[offSet(i, j)].color = 0;
+			grid[offSet(i, j)].prise_pass = false;
+			grid[offSet(i, j)].moved = false;
 		}
 	}
 }
 
 /**
- * \~english @brief renvoi la grille de depart au echec
- * \~english @details Réinitialise la grille en recreen les pieces a leur position initiale au echec
- * \~english permet ainsi de (re)lancer une partie (La fonction prend en parametre la grille a reiitialiser)
+ * \~english @brief Reset the starting grid on failure
+ * \~english @details Resets the grid by recreating the pieces to their initial position at check
+ * \~english @details allows to (re)start a game (The function takes as parameter the grid to be reiitialized)
  *
- * \~english @param[out] grid Le plateau a (re)initialiser
+ * \~english @param[out] grid The board to (re)initialize
  *
- * \~english @warning passer une grille de taille inferieur a 8*8 ou un pointeur invalide provoque une erreur
+ * \~english @warning passing a grid of size inferior to 8*8 or an invalid pointer causes an error
  *
- * \~english Exemple:
+ * \~english Example:
  * @code
  * struct Piece grid[SIZE_BOARD][SIZE_BOARD];
- * reset_grid(grid);
+ * resetGrid(grid);
  * @endcode
- * \~english Modifie la grille en la reinitialisant au statut de depart d'un plateau d'echec
+ * \~english Modifies the grid by resetting it to the starting status of a failure board
  *
- * \~french @brief renvoi la grille de depart au echec
- * \~french @details Réinitialise la grille en recreen les pieces a leur position initiale au echec
+ * \~french @brief renvoi la grille de départ au échec
+ * \~french @details Réinitialise la grille en recréen les pieces a leur position initiale au echec
  * \~french permet ainsi de (re)lancer une partie (La fonction prend en parametre la grille a reiitialiser)
  *
  * \~french @param[out] grid Le plateau a (re)initialiser
  *
- * \~french @warning passer une grille de taille inferieur a 8*8 ou un pointeur invalide provoque une erreur
+ * \~french @warning passer une grille de taille inferieur a 8*8 ou un pointeur invalide provoque un unadressable access
  *
  * \~french Exemple:
  * @code
  * struct Piece grid[SIZE_BOARD][SIZE_BOARD];
- * reset_grid(grid);
+ * resetGrid(grid);
  * @endcode
  * \~french Modifie la grille en la reinitialisant au statut de depart d'un plateau d'echec
  */
-void reset_grid(struct Piece(*const restrict grid))
+void resetGrid(struct Piece(*const restrict grid))
 {
 	assert(grid != NULL && "The pointer on the grid must not be NULL");
-	pos_piece(grid, None, Val_None, 0, 8, 1, 2, 6, 1);
-	pos_piece(grid, Pawn, Val_Pawn, 0, 8, 1, 1, 7, 5);
-	pos_piece(grid, Rook, Val_Rook, 0, 8, 7, 0, 8, 7);
-	pos_piece(grid, Knight, Val_Knight, 1, 7, 5, 0, 8, 7);
-	pos_piece(grid, Bishop, Val_Bishop, 2, 6, 3, 0, 8, 7);
-	pos_piece(grid, Queen, Val_Queen, 3, 4, 1, 0, 8, 7);
-	pos_piece(grid, King, Val_King, 4, 5, 1, 0, 8, 7);
+	posPiece(grid, None, Val_None, 0, 8, 1, 2, 6, 1);
+	posPiece(grid, Pawn, Val_Pawn, 0, 8, 1, 1, 7, 5);
+	posPiece(grid, Rook, Val_Rook, 0, 8, 7, 0, 8, 7);
+	posPiece(grid, Knight, Val_Knight, 1, 7, 5, 0, 8, 7);
+	posPiece(grid, Bishop, Val_Bishop, 2, 6, 3, 0, 8, 7);
+	posPiece(grid, Queen, Val_Queen, 3, 4, 1, 0, 8, 7);
+	posPiece(grid, King, Val_King, 4, 5, 1, 0, 8, 7);
 }
 
 /**
- * @brief Initailise la structure board
+ * \~english @brief Initailise the structure board
  *
- * @return La structure board initialise
+ * \~english @return The structure board initializes
+ *
+ * \~french @brief Initailise la structure board
+ *
+ * \~french @return La structure board initialise
  */
-struct Board Init_Board(void)
+struct Board initBoard(void)
 {
 	struct Board board = {.mailbox_64 = MAILBOX_64, .mailbox_120 = MAILBOX_120, .nb_white_eliminate = 0, .nb_black_eliminate = 0};
-	reset_grid(board.grid);
+	resetGrid(board.grid);
 	return board;
 }
 
 /**
  * \~english @brief Function to move a piece between two squares on the board
- * \~english @details Function that tests if the coordinates are in the board (assert) and moves a piece from one square to another
+ * \~english @details Function that tests if the coordinates are in the board ( \c assert \c) and moves a piece from one square to another
  * \~english (does not test if the move for the chosen piece is valid) and if the move kills a piece in the board.
  * \~english If the move kills an opponent's piece, that piece is added to the opponent's lost pieces table
  *
  * \~english @param[in,out] board The board structure
  * \~english @param[in] dpt Start coordinate
  * \~english @param[in] arv Arrival coordinate
- * \~english
+ *
  * \~english @warning the pointer to the board structure must not be invalid
  * \~english @warning the content of the board structure must be valid
  *
@@ -186,9 +244,9 @@ struct Board Init_Board(void)
  * @code
  * int main(void)
  * {
- * struct Board board = Init_Board();
+ * struct Board board = initBoard();
  * move(&board, COOR(3, 7), COOR(4, 0));
- * print_board(&board, stdout);
+ * printBoard(&board, stdout);
  * }
  * @endcode
  * \~english display :
@@ -205,13 +263,13 @@ struct Board Init_Board(void)
  * \~english We see that the lady in D1 (3, 7) is moved to E8 (4, 0)
  *
  * \~french @brief Fonction permettant de deplacer une piece entre deux case de l'echequier
- * \~french @details Fonction testant si les coordonnees sont dans le plateau (assert) et deplace une piece d'une case
+ * \~french @details Fonction testant si les coordonnées sont dans le plateau ( \c assert \c) et deplace une piece d'une case
  * \~french a une autre selon les coordonnes (ne teste pas si le mouvement pour la piece choisit est valide) et si le
  * \~french mouvement tue une piece de l'adversaire, cette piece est ajoute au tableau des pieces perdue de l'adversaire
  *
  * \~french @param[in,out] board La structure du plateau
- * \~french @param[in] dpt Coordonnee de depart
- * \~french @param[in] arv Coordonnee d'arrive
+ * \~french @param[in] dpt Coordonnée de depart
+ * \~french @param[in] arv Coordonnée d'arrive
  * \~french
  * \~french @warning le pointeur sur la structure Board ne doit pas etre invalide
  * \~french @warning le contenu de la structure board doit etre valide
@@ -220,9 +278,9 @@ struct Board Init_Board(void)
  * @code
  * int main(void)
  * {
- *     struct Board board = Init_Board();
+ *     struct Board board = initBoard();
  *     move(&board, COOR(3, 7), COOR(4, 0));
- *     print_board(&board, stdout);
+ *     printBoard(&board, stdout);
  * }
  * @endcode
  * \~french affiche :
@@ -238,7 +296,7 @@ struct Board Init_Board(void)
  * @endcode
  * \~french On voit que la dame en D1 (3, 7) est deplace en E8 (4, 0)
  */
-void move(struct Board *const restrict board, uint8_t const dpt, uint8_t const arv)
+void move(struct Board *const restrict board, unsigned char const dpt, unsigned char const arv)
 {
 	assert(dpt < SIZE_BOARD && "Starting coordinate outside the grid");
 	assert(arv < SIZE_BOARD && "Ending coordinate outside the grid");
@@ -263,7 +321,7 @@ void move(struct Board *const restrict board, uint8_t const dpt, uint8_t const a
  * \~english @brief Returns the colour associated with the player
  * \~english Returns the colour associated with the player, i.e. 'W' for entry 1 and 'B' for entry -1 and otherwise the space character (ASCII 32)
  *
- * \~english @param[in] player
+ * \~english @param[in] player the player number (white:1, black:-1, none:0)
  * \~english @return The character associated with the colour of the player among ('B', 'W', ' ')
  *
  * \~english Example :
@@ -276,9 +334,9 @@ void move(struct Board *const restrict board, uint8_t const dpt, uint8_t const a
  * @endcode
  *
  * \~french @brief Renvoie la couleur associe au joueur
- * \~french @details Renvoie la couleur associe au joueur soit 'W' pour l'entree 1 et 'B' pour l'entree -1 et sinon le caractere espace (ASCII 32)
+ * \~french @details Renvoie la couleur associe au joueur soit 'W' pour l'entrée 1 et 'B' pour l'entrée -1 et sinon le caractere espace (ASCII 32)
  *
- * \~french @param[in] player
+ * \~french @param[in] player le numero du joueur (blanc:1, noir:-1, aucun:0)
  * \~french @return La caractrere associe a la couleur du joueur parmis ('B', 'W', ' ')
  *
  * \~french Exemple :
@@ -290,8 +348,9 @@ void move(struct Board *const restrict board, uint8_t const dpt, uint8_t const a
  * W, B,  ...
  * @endcode
  */
-static inline char player_color(int const player)
+static inline char playerColor(signed char const player)
 {
+	assert(player >= -1 && player <= 1 && "player can only be -1, 0 or 1");
 	if (player == 1)
 	{
 		return 'W';
@@ -306,60 +365,120 @@ static inline char player_color(int const player)
 /**
  * \~english @brief Displays the ladder in the stream indicated in parameter
  *
- * \english @param[in] board The board structure of the game board
- * \english @param[out] out The output or write board
- * \english @return int returns on error -1 otherwise 0
+ * \~english @param[in] board The board structure of the game board
+ * \~english @param[out] out The output or write board
+ * \~english @return int returns on error -1 otherwise 0
  *
- * \english @exception EILSEQ A wide character code that does not match a valid character has been detected (fprintf)
- * \~english @exception EINVAL Insufficient arguments (fprintf)
- * \~english @exception ENOMEM Insufficient storage space (fprintf)
- * \english @exception EOVERFLOW The value of n is greater than 2147483647 or the number of bytes needed to hold 
- * \~english @exception EOVERFLOW The value of n is greater than 2147483647 or the number of bytes required to contain the output excluding 
- * \~english the null termination value is greater than 2147483647 (fprintf)
- * 
- * 
+ * \~english @warning the pointer to the board structure must not be invalid
+ * \~english @warning the content of the board structure must be valid
+ *
+ * \~english @exception EILSEQ A wide character code that does not match a valid character has been detected ( \c fprint )
+ * \~english @exception EINVAL Insufficient arguments ( \c fprintf )
+ * \~english @exception ENOMEM Insufficient storage space ( \c fprintf )
+ * \english @exception EOVERFLOW The value of n is greater than 2147483647 or the number of bytes needed to hold
+ * \~english @exception EOVERFLOW The value of n is greater than 2147483647 or the number of bytes required to contain the output excluding
+ * \~english the null termination value is greater than 2147483647 ( \c fprintf )
+ *
+ *
  * \~french  @brief Affiche l'echequier dans le flux indiqué en parametre
  *
  * \~french @param[in] board La structure board du plateau du jeu
  * \~french @param[out] out La sortie ou ecrire le plateau
  * \~french @return int retoure en cas d'erreur -1 sinon 0
  *
- * \~french @exception EILSEQ Un code de caractères larges qui ne correspond pas à un caractère valide a été détecté (fprintf)
- * \~french @exception EINVAL Les arguments sont insuffisants (fprintf)
- * \~french @exception ENOMEM Espace de stockage insuffisant (fprintf)
- * \~french @exception EOVERFLOW La valeur de n est supérieure à 2147483647 ou le nombre d’octets nécessaires pour contenir 
- * \~french la sortie à l’exclusion de la valeur null de terminaison est supérieur à 2147483647 (fprintf)
+ * \~french @warning le pointeur sur la structure Board ne doit pas etre invalide
+ * \~french @warning le contenu de la structure board doit etre valide
+ *
+ * \~french @exception EILSEQ Un code de caractères larges qui ne correspond pas à un caractère valide a été détecté ( \c fprintf )
+ * \~french @exception EINVAL Les arguments sont insuffisants ( \c fprintf )
+ * \~french @exception ENOMEM Espace de stockage insuffisant ( \c fprintf )
+ * \~french @exception EOVERFLOW La valeur de n est supérieure à 2147483647 ou le nombre d’octets nécessaires pour contenir
+ * \~french la sortie à l’exclusion de la valeur null de terminaison est supérieur à 2147483647 ( \c fprintf )
  */
-int print_board(struct Board const *const restrict board, FILE *const restrict out)
+int printBoard(struct Board const *const restrict board, FILE *const restrict out)
 {
-	for (uint8_t i = 0; i < SIZE_BOARD; i++)
+	assert(board != NULL && "board cannot be NULL");
+	assert(out != NULL && "out cannot be NULL");
+	for (unsigned char i = 0; i < SIZE_BOARD; i++)
 	{
-		fprintf(out, " %c%c ", player_color(board->grid[i].color), board->grid[i].type);
-		return_except(-1);
+		fprintf(out, " %c%c ", playerColor(board->grid[i].color), board->grid[i].type);
+		returnExcept(-1);
 		if ((i + 1) % 8 == 0)
 		{
 			fputc('\n', out);
-			return_except(-1);
+			returnExcept(-1);
 		}
 	}
 	return 0;
 }
 
-static void get_piece_move(struct Board const *const restrict board, List_move *const restrict list, int8_t const *const tab_move, uint8_t const size_tab)
+/**
+ * \~english @brief Complete the move list for a piece with in-line or diagonal moves
+ * \~english @details Adds to the end of the list the moves in line, column and diagonal as long as there is no obstacle or enemy player:
+ * \~english * If it is a piece of the same player we have finished testing this row/column/diagonal
+ * \~english * If it is an enemy piece we add it to the list and finish testing this line/column/diagonal
+ * \~english * Otherwise we add the move to the list and test the next square
+ *
+ * \~english @param[in] board A pointer to the board structure
+ * \~english @param[in, out] list The list of moves that will be modified by the function, it must be initialized with the starting move before calling the function
+ * \~english @param[in] tabMove The array of moves relative to mailbox 120, e.g. [-10, -1, 1, 10] for rows and columns (tower move)
+ * \~english @param[in] sizeTabMove The size of the motion array
+ *
+ * \~english @warning the pointer to the Board structure must not be invalid
+ * \~english @warning the content of the Board structure must be valid
+ *
+ * \~french @brief Completer la liste de mouvement pour une piece ayant des mouvements en ligne ou diagonal
+ * \~french @details Ajoute a la fin de la liste les mouvements en ligne, colonne et diagonal tant qu'il n'y a ni obstacle ni joueur ennemi :
+ * \~french * Si c'est une piece du meme joueur on a terminer de tester cette ligne/colonne/diagonal
+ * \~french * Si c'est une piece ennemi on l'ajoute a la liste et on a terminer de tester cette ligne/colonne/diagonal
+ * \~french * Sinon on ajoute le mouvement a la liste et on va tester la case suivante
+ *
+ * \~french @param[in] board Un pointeur sur la structure board
+ * \~french @param[in, out] list La liste de mouvement qui sera modifie par la fonction, la doit etre initialise au prealable avec le mouvement de depart avant l'appel de la fonction
+ * \~french @param[in] tabMove Le tableau de deplacement par rapport a la mailbox 120, par exemple [-10, -1, 1, 10] pour les lignes et les colonnes (mouvement de la tour)
+ * \~french @param[in] sizeTabMove La taille du tableau de mouvement
+ *
+ * \~french @warning le pointeur sur la structure Board ne doit pas etre invalide
+ * \~french @warning le contenu de la structure Board doit etre valide
+ */
+static void getPieceMove(struct Board const *const restrict board, ListMove *const restrict list, signed char const *const tabMove, unsigned char const sizeTabMove)
 {
-	for (int i = 0; i < size_tab; i++)
+	assert(board != NULL && "board cannot be NULL");
+	assert(list != NULL && "list cannot be NULL");
+	assert(tabMove != NULL && "tabMove cannot be NULL");
+	for (int i = 0; i < sizeTabMove; i++)
 	{
-		int8_t actu = board->mailbox_64[list->dpt] + tab_move[i];
+		signed char actu = board->mailbox_64[list->dpt] + tabMove[i];
 		while (board->mailbox_120[actu] != -1)
 		{
 			if (board->grid[board->mailbox_120[actu]].color == 0)
 			{
-				list->push_back(list, board->mailbox_120[actu]);
-				actu += tab_move[i];
+				list->pushBack(list, board->mailbox_120[actu]);
+				try
+				{
+					catch (ERROR_NOT_ENOUGH_SPACE) : 
+						perror("In getPieceMove to the pushBack call");
+						list->clear(list);
+						break;
+					catchAllExcept :
+						perror("In getPieceMove to the pushBack call");
+						break;
+				} endTry;
+				actu += tabMove[i];
 			}
 			else if (board->grid[board->mailbox_120[actu]].color == board->grid[list->dpt].color * -1)
 			{
-				list->push_back(list, board->mailbox_120[actu]);
+				list->pushBack(list, board->mailbox_120[actu]);
+				try
+				{
+					catch (ERROR_NOT_ENOUGH_SPACE) : 
+						perror("In getPieceMove to the pushBack call");
+						list->clear(list);
+						break;
+					catchAllExcept :
+						perror("In getPieceMove to the pushBack call");
+						break;
+				} endTry;
 				break;
 			}
 			else
@@ -370,72 +489,196 @@ static void get_piece_move(struct Board const *const restrict board, List_move *
 	}
 }
 
-void get_list_move(struct Board const *const restrict board, List_move *const restrict list)
+/**
+ * \~english @brief Complete la liste passe en parametre
+ * \~english @details Complete la liste passe en parametre des mouvements de la piece indique a la coordonnes assigne lors de l'appelle de la fonction \c initListMove au prealable
+ * \~english @param[in] board Un pointeur sur la structure board
+ * \~english @param[in, out] list Un liste initialisée vide que la fonction va completer
+ *
+ * \~english @warning le pointeur sur la structure Board ne doit pas etre invalide
+ * \~english @warning le contenu de la structure Board doit etre valide
+ * 
+ * @code
+ * struct Board board = InitBoard();
+ * ListMove list = initListMove(offSet(6, 4));
+ * getListMove(&board, &list);
+ * @endcode
+ * 
+ * 
+ * \~french @brief Complete la liste passe en parametre
+ * \~french @details Complete la liste passe en parametre des mouvements de la piece indique a la coordonnes assigne lors de l'appelle de la fonction \c initListMove au prealable
+ * \~french @param[in] board Un pointeur sur la structure board
+ * \~french @param[in, out] list Un liste initialisée vide que la fonction va completer
+ *
+ * \~french @warning le pointeur sur la structure Board ne doit pas etre invalide
+ * \~french @warning le contenu de la structure Board doit etre valide
+ * 
+ * @code
+ * struct Board board = InitBoard();
+ * ListMove list = initListMove(offSet(6, 4));
+ * getListMove(&board, &list);
+ * @endcode
+ */
+void getListMove(struct Board const *const restrict board, ListMove *const restrict list)
 {
+	assert(board != NULL && "board cannot be NULL");
+	assert(list != NULL && "list cannot be NULL");
 	assert(list->dpt < SIZE_BOARD && "invalide coordinate list.dpt");
 	switch (board->grid[list->dpt].type)
 	{
 	case Rook:;
-		int8_t const move_tower[4] = {-10, -1, 1, 10};
-		get_piece_move(board, list, move_tower, 4);
+		signed char const move_tower[4] = {-10, -1, 1, 10};
+		getPieceMove(board, list, move_tower, 4);
 		break;
 	case Knight:;
-		int8_t const move_knight[8] = {-21, -19, -12, -8, 8, 12, 19, 21};
+		signed char const move_knight[8] = {-21, -19, -12, -8, 8, 12, 19, 21};
 		for (int i = 0; i < 8; i++)
 		{
-			int8_t const actu = board->mailbox_64[list->dpt] + move_knight[i];
+			signed char const actu = board->mailbox_64[list->dpt] + move_knight[i];
 			if (board->mailbox_120[actu] != -1 && board->grid[board->mailbox_120[actu]].color != board->grid[list->dpt].color)
 			{
-				list->push_back(list, board->mailbox_120[actu]);
+				list->pushBack(list, board->mailbox_120[actu]);
+				try
+				{
+					catch (ERROR_NOT_ENOUGH_SPACE) : 
+						perror("In getListMove to the pushBack call");
+						list->clear(list);
+						return;
+					catchAllExcept :
+						perror("In getListMove to the pushBack call");
+						break;
+				} endTry;
 			}
 		}
 		break;
 	case Bishop:;
-		int8_t const move_bishop[4] = {-11, -9, 9, 11};
-		get_piece_move(board, list, move_bishop, 4);
+		signed char const move_bishop[4] = {-11, -9, 9, 11};
+		getPieceMove(board, list, move_bishop, 4);
 		break;
 	case Queen:;
-		int8_t const move_queen[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
-		get_piece_move(board, list, move_queen, 8);
+		signed char const move_queen[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
+		getPieceMove(board, list, move_queen, 8);
 		break;
 	case King:;
-		int8_t const move_king[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
+		signed char const move_king[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
 		for (int i = 0; i < 8; i++)
 		{
-			int8_t const actu = board->mailbox_64[list->dpt] + move_king[i];
+			signed char const actu = board->mailbox_64[list->dpt] + move_king[i];
 			if (board->mailbox_120[actu] != -1 && board->grid[board->mailbox_120[actu]].color != board->grid[list->dpt].color)
 			{
-				list->push_back(list, board->mailbox_120[actu]);
+				list->pushBack(list, board->mailbox_120[actu]);
+				try
+				{
+					catch (ERROR_NOT_ENOUGH_SPACE) : 
+						perror("In getListMove to the pushBack call");
+						list->clear(list);
+						return;
+					catchAllExcept :
+						perror("In getListMove to the pushBack call");
+						break;
+				} endTry;
 			}
 		}
 		break;
 	case Pawn:;
 
-		int8_t const color = board->grid[list->dpt].color;
-		uint8_t const dpt = board->mailbox_64[list->dpt];
-		uint8_t const advance = dpt + color * (-10);
-		uint8_t const eat[2] = {board->mailbox_64[list->dpt] + color * (-11), board->mailbox_64[list->dpt] + color * (-9)};
+		signed char const color = board->grid[list->dpt].color;
+		unsigned char const dpt = board->mailbox_64[list->dpt];
+		unsigned char const advance = dpt + color * (-10);
+		unsigned char const eat[2] = {board->mailbox_64[list->dpt] + color * (-11), board->mailbox_64[list->dpt] + color * (-9)};
 		if (board->mailbox_120[advance] != -1 && board->grid[board->mailbox_120[advance]].color == 0)
 		{
-			list->push_back(list, board->mailbox_120[advance]);
+			list->pushBack(list, board->mailbox_120[advance]);
 			if (board->grid[list->dpt].moved == false && board->grid[board->mailbox_120[advance + color * (-10)]].color == 0)
 			{
-				list->push_back(list, board->mailbox_120[advance + color * (-10)]);
+				list->pushBack(list, board->mailbox_120[advance + color * (-10)]);
+				try
+				{
+					catch (ERROR_NOT_ENOUGH_SPACE) : 
+						perror("In getListMove to the pushBack call");
+						list->clear(list);
+						return;
+					catchAllExcept :
+						perror("In getListMove to the pushBack call");
+						break;
+				} endTry;
 			}
 		}
 		for (int i = 0; i < 2; i++)
 		{
 			if (board->mailbox_120[eat[i]] != -1 && board->grid[board->mailbox_120[eat[i]]].color == color * -1)
 			{
-				list->push_back(list, board->mailbox_120[eat[i]]);
+				list->pushBack(list, board->mailbox_120[eat[i]]);
+				try
+				{
+					catch (ERROR_NOT_ENOUGH_SPACE) : 
+						perror("In getListMove to the pushBack call");
+						list->clear(list);
+						return;
+					catchAllExcept :
+						perror("In getListMove to the pushBack call");
+						break;
+				} endTry;
 			}
 			else if (board->mailbox_120[eat[i]] != -1 && board->grid[board->mailbox_120[eat[i]]].color == 0 && board->grid[board->mailbox_120[eat[i] + 10 * color]].prise_pass == true)
 			{
-				list->push_back(list, board->mailbox_120[eat[i]]);
+				list->pushBack(list, board->mailbox_120[eat[i]]);
+				try
+				{
+					catch (ERROR_NOT_ENOUGH_SPACE) : 
+						perror("In getListMove to the pushBack call");
+						list->clear(list);
+						return;
+					catchAllExcept :
+						perror("In getListMove to the pushBack call");
+						break;
+				} endTry;
 			}
 		}
 		break;
 	default:
 		break;
+	}
+}
+
+/**
+ * @brief La fonction permettant de completer la liste des mouvements du roi si il peut roquer
+ * @details ajoute a la liste de mouvement les cases d'arrivées du roi après un roque
+ * 
+ * @param[in] board La structure board
+ * @param[in, out] list La liste à compléter
+ * 
+ */
+void castling(struct Board const *const restrict board, ListMove *const restrict list, unsigned char const coor_king)
+{
+	unsigned char const startedPositionKingWhite = 60;
+	unsigned char const startedPositionKingBlack = 4;
+	 
+	if ( /*!Check(...) && */(coor_king == startedPositionKingWhite || coor_king == startedPositionKingBlack) && board->grid[coor_king].moved == false)
+	{
+		unsigned char index_min = coor_king+1;
+		unsigned char index_max = coor_king-1;
+		if (!board->grid[coor_king-4].moved)
+		{
+			index_min = coor_king-3;
+		}
+		if (!board->grid[coor_king+3].moved)
+		{
+			index_max = coor_king+2;
+		}
+		unsigned char result = 0b0011;
+		for (unsigned char i = index_min; i <= index_max; i++)
+		{
+			if (board->grid[i].type != None || (i > coor_king-3 && i < coor_king+2 /*&& !Check(..., coor_king) && */) )
+			{
+				if (i < coor_king ||  (i > coor_king-3 /* && !Check(..., coor_king) */ ) )
+				{
+					result &= 2; // 1 << 1
+					i = coor_king+1;
+					continue;
+				}
+				else if ()
+			}
+		}
 	}
 }
