@@ -74,7 +74,7 @@
  * \~french @param y indice y
  * \~french @return int indice unidimensionnelle
  */
-int offSet(unsigned char const x, unsigned char const y)
+int offSet(uint8_t const x, uint8_t const y)
 {
 	assert(x <= WIDTH_BOARD && "x out of grid");
 	assert(y <= WIDTH_BOARD && "y out of grid");
@@ -90,7 +90,7 @@ int offSet(unsigned char const x, unsigned char const y)
  * \~french @param coor indice unidimensionnelle
  * \~french @return int indice x
  */
-int getX(unsigned char const coor)
+int getX(uint8_t const coor)
 {
 	assert(coor <= SIZE_BOARD && "coor out of grid");
 	return coor % WIDTH_BOARD;
@@ -105,7 +105,7 @@ int getX(unsigned char const coor)
  * \~french @param coor indice unidimensionnelle
  * \~french @return int indice y
  */
-int getY(unsigned char const coor)
+int getY(uint8_t const coor)
 {
 	assert(coor <= SIZE_BOARD && "coor out of grid");
 	return coor / WIDTH_BOARD;
@@ -147,12 +147,12 @@ int getY(unsigned char const coor)
  * \~french @warning passer une grille de taille inferieur a 8*8 ou un pointeur invalide provoque une erreur
  *
  */
-static void posPiece(struct Piece *const restrict grid, enum TypePiece const type, enum ValuePiece const value, unsigned char const minX, unsigned char const maxX, unsigned char const increaseX, unsigned char const minY, unsigned char const maxY, unsigned char const increaseY)
+static void posPiece(struct Piece *const restrict grid, enum TypePiece const type, enum ValuePiece const value, uint8_t const minX, uint8_t const maxX, uint8_t const increaseX, uint8_t const minY, uint8_t const maxY, uint8_t const increaseY)
 {
 	assert(grid != NULL && "grid cannot be NULL");
-	for (unsigned char i = minX; i < maxX; i += increaseX)
+	for (uint8_t i = minX; i < maxX; i += increaseX)
 	{
-		for (unsigned char j = minY; j < maxY; j += increaseY)
+		for (uint8_t j = minY; j < maxY; j += increaseY)
 		{
 			grid[offSet(i, j)].type = type;
 			grid[offSet(i, j)].value = value;
@@ -296,7 +296,7 @@ struct Board initBoard(void)
  * @endcode
  * \~french On voit que la dame en D1 (3, 7) est deplace en E8 (4, 0)
  */
-void move(struct Board *const restrict board, unsigned char const dpt, unsigned char const arv)
+void move(struct Board *const restrict board, uint8_t const dpt, uint8_t const arv)
 {
 	assert(dpt < SIZE_BOARD && "Starting coordinate outside the grid");
 	assert(arv < SIZE_BOARD && "Ending coordinate outside the grid");
@@ -348,7 +348,7 @@ void move(struct Board *const restrict board, unsigned char const dpt, unsigned 
  * W, B,  ...
  * @endcode
  */
-static inline char playerColor(signed char const player)
+static inline char playerColor(int8_t const player)
 {
 	assert(player >= -1 && player <= 1 && "player can only be -1, 0 or 1");
 	if (player == 1)
@@ -399,7 +399,7 @@ int printBoard(struct Board const *const restrict board, FILE *const restrict ou
 {
 	assert(board != NULL && "board cannot be NULL");
 	assert(out != NULL && "out cannot be NULL");
-	for (unsigned char i = 0; i < SIZE_BOARD; i++)
+	for (uint8_t i = 0; i < SIZE_BOARD; i++)
 	{
 		fprintf(out, " %c%c ", playerColor(board->grid[i].color), board->grid[i].type);
 		returnExcept(-1);
@@ -441,14 +441,14 @@ int printBoard(struct Board const *const restrict board, FILE *const restrict ou
  * \~french @warning le pointeur sur la structure Board ne doit pas etre invalide
  * \~french @warning le contenu de la structure Board doit etre valide
  */
-static void getPieceMove(struct Board const *const restrict board, ListMove *const restrict list, signed char const *const tabMove, unsigned char const sizeTabMove)
+static void getPieceMove(struct Board const *const restrict board, ListMove *const restrict list, int8_t const *const tabMove, uint8_t const sizeTabMove)
 {
 	assert(board != NULL && "board cannot be NULL");
 	assert(list != NULL && "list cannot be NULL");
 	assert(tabMove != NULL && "tabMove cannot be NULL");
 	for (int i = 0; i < sizeTabMove; i++)
 	{
-		signed char actu = board->mailbox_64[list->dpt] + tabMove[i];
+		int8_t actu = board->mailbox_64[list->dpt] + tabMove[i];
 		while (board->mailbox_120[actu] != -1)
 		{
 			if (board->grid[board->mailbox_120[actu]].color == 0)
@@ -527,14 +527,14 @@ void getListMove(struct Board const *const restrict board, ListMove *const restr
 	switch (board->grid[list->dpt].type)
 	{
 	case Rook:;
-		signed char const move_tower[4] = {-10, -1, 1, 10};
+		int8_t const move_tower[4] = {-10, -1, 1, 10};
 		getPieceMove(board, list, move_tower, 4);
 		break;
 	case Knight:;
-		signed char const move_knight[8] = {-21, -19, -12, -8, 8, 12, 19, 21};
+		int8_t const move_knight[8] = {-21, -19, -12, -8, 8, 12, 19, 21};
 		for (int i = 0; i < 8; i++)
 		{
-			signed char const actu = board->mailbox_64[list->dpt] + move_knight[i];
+			int8_t const actu = board->mailbox_64[list->dpt] + move_knight[i];
 			if (board->mailbox_120[actu] != -1 && board->grid[board->mailbox_120[actu]].color != board->grid[list->dpt].color)
 			{
 				list->pushBack(list, board->mailbox_120[actu]);
@@ -552,18 +552,18 @@ void getListMove(struct Board const *const restrict board, ListMove *const restr
 		}
 		break;
 	case Bishop:;
-		signed char const move_bishop[4] = {-11, -9, 9, 11};
+		int8_t const move_bishop[4] = {-11, -9, 9, 11};
 		getPieceMove(board, list, move_bishop, 4);
 		break;
 	case Queen:;
-		signed char const move_queen[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
+		int8_t const move_queen[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
 		getPieceMove(board, list, move_queen, 8);
 		break;
 	case King:;
-		signed char const move_king[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
+		int8_t const move_king[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
 		for (int i = 0; i < 8; i++)
 		{
-			signed char const actu = board->mailbox_64[list->dpt] + move_king[i];
+			int8_t const actu = board->mailbox_64[list->dpt] + move_king[i];
 			if (board->mailbox_120[actu] != -1 && board->grid[board->mailbox_120[actu]].color != board->grid[list->dpt].color)
 			{
 				list->pushBack(list, board->mailbox_120[actu]);
@@ -582,10 +582,10 @@ void getListMove(struct Board const *const restrict board, ListMove *const restr
 		break;
 	case Pawn:;
 
-		signed char const color = board->grid[list->dpt].color;
-		unsigned char const dpt = board->mailbox_64[list->dpt];
-		unsigned char const advance = dpt + color * (-10);
-		unsigned char const eat[2] = {board->mailbox_64[list->dpt] + color * (-11), board->mailbox_64[list->dpt] + color * (-9)};
+		int8_t const color = board->grid[list->dpt].color;
+		uint8_t const dpt = board->mailbox_64[list->dpt];
+		uint8_t const advance = dpt + color * (-10);
+		uint8_t const eat[2] = {board->mailbox_64[list->dpt] + color * (-11), board->mailbox_64[list->dpt] + color * (-9)};
 		if (board->mailbox_120[advance] != -1 && board->grid[board->mailbox_120[advance]].color == 0)
 		{
 			list->pushBack(list, board->mailbox_120[advance]);
@@ -649,15 +649,15 @@ void getListMove(struct Board const *const restrict board, ListMove *const restr
  * @param[in, out] list La liste à compléter
  * 
  */
-void castling(struct Board const *const restrict board, ListMove *const restrict list, unsigned char const coor_king)
+void castling(struct Board const *const restrict board, ListMove *const restrict list, uint8_t const coor_king)
 {
-	unsigned char const startedPositionKingWhite = 60;
-	unsigned char const startedPositionKingBlack = 4;
+	uint8_t const startedPositionKingWhite = 60;
+	uint8_t const startedPositionKingBlack = 4;
 	 
 	if ( /*!Check(...) && */(coor_king == startedPositionKingWhite || coor_king == startedPositionKingBlack) && board->grid[coor_king].moved == false)
 	{
-		unsigned char index_min = coor_king+1;
-		unsigned char index_max = coor_king-1;
+		uint8_t index_min = coor_king+1;
+		uint8_t index_max = coor_king-1;
 		if (!board->grid[coor_king-4].moved)
 		{
 			index_min = coor_king-3;
@@ -666,8 +666,8 @@ void castling(struct Board const *const restrict board, ListMove *const restrict
 		{
 			index_max = coor_king+2;
 		}
-		unsigned char result = 0b0011;
-		for (unsigned char i = index_min; i <= index_max; i++)
+		uint8_t result = 0b0011;
+		for (uint8_t i = index_min; i <= index_max; i++)
 		{
 			if (board->grid[i].type != None || (i > coor_king-3 && i < coor_king+2 /*&& !Check(..., coor_king) && */) )
 			{

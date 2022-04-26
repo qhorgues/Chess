@@ -4,19 +4,19 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
- 
+#include "ListMove.h"
+
 #define SIZE_BOARD 64
 #define WIDTH_BOARD 8
-#include "List_move.h"
 
 
 
 
 /**
- * @enum Type_piece
+ * @enum TypePiece
  * @brief Stocke le code ASCII de la lettre de la piece associé
  */
-enum Type_piece
+enum TypePiece
 {
     None = 32,
     Pawn = 80,
@@ -28,10 +28,10 @@ enum Type_piece
 };
 
 /**
- * @enum Value_piece
+ * @enum ValuePiece
  * @brief Enumeration de la valeur numerique de chaque piece
  */
-enum Value_piece 
+enum ValuePiece 
 {
     Val_None = 0,
     Val_Pawn = 1,
@@ -46,15 +46,15 @@ enum Value_piece
  * @struct Piece
  * @brief Les informations d'une piece
  * @details  La structure d'une piece contenant son type, sa valeur,
- * sa couleur (1 <Blanc>, -1 <Noir>) un booleen pour determiner si
- * le pion peut etre pris en prise en passant (le booleen est inutilisé)
- * pour les autres pieces et un booleen pour determiner si une piece a deja
+ * sa couleur (1 <Blanc>, -1 <Noir>) un booléen pour determiner si
+ * le pion peut etre pris en prise en passant pour les autres pieces le booléen est inutilisé 
+ * et un booléen pour determiner si une piece a deja
  * bouge, pour le roque ou le double mouvement du pion notamment.
  */
 struct Piece
 {
-    enum Type_piece type;
-    enum Value_piece value;
+    enum TypePiece type;
+    enum ValuePiece value;
     int8_t color;
     bool prise_pass;
     bool moved;
@@ -65,7 +65,7 @@ struct Piece
  * @brief La structure contenant le plateau, les mailboxs et le tableau des elimines
  * @details Contient la grille du jeu, la mailbox 120 permettant de gerer les debordements de plateau
  * lors des mouvements et la mailbox 64 permettant de localiser la case de depart d'un mouvement sur
- * la mailbox 120, le tableau des pieces blaches et noirs eliminees et enfin le nombre de piece eliminee respectivement
+ * la mailbox 120, le tableau des pieces blanches et noirs eliminées et enfin le nombre de piece eliminée respectivement
  * 
  */
 struct Board
@@ -88,7 +88,7 @@ struct Board
      * 91, 92, 93, 94, 95, 96, 97, 98 
      * @endcode
      */
-    const uint8_t mailbox_64[64];
+    uint8_t const mailbox_64[64];
 
     /**
      * 
@@ -108,45 +108,45 @@ struct Board
      * -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
      * @endcode
      */
-    const int8_t mailbox_120[120];
+    int8_t const mailbox_120[120];
     
     /**
-     * @brief Le tableau de toutes les pieces blanches eliminees 
+     * @brief Le tableau de toutes les pieces blanches eliminées 
      */
     struct Piece eliminate_white[15];
     
     /**
-     * @brief Le tableau de toutes les pieces noirs eliminees 
+     * @brief Le tableau de toutes les pieces noirs eliminées 
      */
     struct Piece eliminate_black[15];
 
     /**
-     * @brief Le nombre de piece blanche eliminees permettant de toujours indexer a des valeurs initialisees 
+     * @brief Le nombre de piece blanche eliminées permettant de toujours indexer a des valeurs initialisées 
      */
-    size_t nb_white_eliminate;
+    uint8_t nb_white_eliminate;
 
     /**
-     * @brief Le nombre de piece noir eliminees permettant de toujours indexer a des valeurs initialisees 
+     * @brief Le nombre de piece noir eliminées permettant de toujours indexer a des valeurs initialisées 
      */
-    size_t nb_black_eliminate;
+    uint8_t nb_black_eliminate;
 
 };
 
-extern void reset_grid(struct Piece (*restrict grid));
-extern struct Board Init_Board(void);
+extern void resetGrid(struct Piece *const restrict grid);
+extern struct Board initBoard(void);
 extern void move(struct Board *const restrict board, uint8_t const dpt, uint8_t const arv);
-extern int print_board(const struct Board *restrict board, FILE *restrict out);
-extern void get_list_move(struct Board const *const restrict board, List_move *const restrict list);
+extern int printBoard(struct Board const *const restrict board, FILE *restrict out);
+extern void getListMove(struct Board const *const restrict board, ListMove *const restrict list);
 
 
 #if defined(NDEBUG)
-	#define off_set(x, y) (y * WIDTH_BOARD + x)
-	#define get_x(coor) (coor % WIDTH_BOARD)
-	#define get_y(coor) (coor / WIDTH_BOARD)
+	#define offSet(x, y) (y * WIDTH_BOARD + x)
+	#define getX(coor) (coor % WIDTH_BOARD)
+	#define getY(coor) (coor / WIDTH_BOARD)
 #else
-	extern int off_set(uint8_t const x, uint8_t const y);
-	extern int get_x(uint8_t const coor);
-	extern int get_y(uint8_t const coor);
+	extern int offSet(uint8_t const x, uint8_t const y);
+	extern int getX(uint8_t const coor);
+	extern int getY(uint8_t const coor);
 #endif
 
 #endif
