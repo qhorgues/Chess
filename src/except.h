@@ -14,17 +14,17 @@
  * perror("fprintf");
  * break;
  * 
- * } end_try; // Exit the try IMPORTANT reset EXCEPTION to 0 with end_try;
+ * } endTry; // Exit the try IMPORTANT reset EXCEPTION to 0 with endTry;
  * @endcode
  * \~english example by retrieving all the exceptions :
  * @code
  * fprintf(stdout, "Hello World");
  * try
  * {
- * catch_all_except: // Catch all errors
+ * catchAllExcept: // Catch all errors
  * perror("fprintf");
  * break;
- * } end_try;
+ * } endTry;
  * @endcode
  * \~english and here is a complete example:
  * @code 
@@ -38,7 +38,7 @@
  * throw(ERROR_INVALID_ARGUMENT, NO_VALUE); // throw an invalid argument exception
  * }
  * printf("%d\n", a);
- * return_except
+ * returnExcept
  * // Code
  * }
  * 
@@ -50,15 +50,15 @@
  * catch(ERROR_INVALID_ARGUMENT): // If the error is an invalid argument
  * perror("Error argument in function f");
  * break;
- * catch_all_except: // If this is another error
+ * catchAllExcept: // If this is another error
  * perror("Error in function f");
  * break;
- * end_try;
+ * endTry;
  * return 0;
  * }
  * @endcode
  * 
- * \~english @copyright Copyright (c) 2022 
+ * \~english @copyright Copyright (c) 2022 by Quentin Horgues
  * 
  * 
  *
@@ -77,17 +77,17 @@
  *          perror("fprintf");
  *          break;
  * 
- * } end_try; // On quitte le try IMPORTANT on réinitialise EXCEPTION à 0 avec end_try;
+ * } endTry; // On quitte le try IMPORTANT on réinitialise EXCEPTION à 0 avec endTry;
  * @endcode
  * \~french exemple en recuperant toutes les exceptions :
  * @code
  * fprintf(stdout, "Hello World");
  * try
  * {
- *     catch_all_except: // On recupere toutes les erreurs
+ *     catchAllExcept: // On recupere toutes les erreurs
  *          perror("fprintf");
  *          break;
- * } end_try;
+ * } endTry;
  * @endcode
  * \~french et voici un exemple complet :
  * @code 
@@ -101,7 +101,7 @@
  *         throw(ERROR_INVALID_ARGUMENT, NO_VALUE); // On lance une exception d'argument invalide
  *     }
  *     printf("%d\n", a);
- *     return_except
+ *     returnExcept
  *     // Code
  * }
  * 
@@ -113,15 +113,15 @@
  *         catch(ERROR_INVALID_ARGUMENT): // Si l'erreur est un argument invalide
  *             perror("Error argument in function f");
  *             break;
- *         catch_all_except: // Si c'est une autre erreur
+ *         catchAllExcept: // Si c'est une autre erreur
  *             perror("Error in function f");
  *             break;
- *     } end_try;
+ *     } endTry;
  *     return 0;
  * }
  * @endcode
  * 
- * \~french @copyright Copyright (c) 2022 * 
+ * \~french @copyright Copyright (c) 2022 par Quentin Horgues
  */
 #ifndef EXCEPT_H
 #define EXCEPT_H
@@ -148,8 +148,8 @@
 
 /**
  * @def NO_VALUE
- * \~english @brief Use in the throw/return_except of a function returning void
- * \~french @brief Utiliser dans le throw/return_except d'une fonction retournant void
+ * \~english @brief Use in the throw/returnExcept of a function returning void
+ * \~french @brief Utiliser dans le throw/returnExcept d'une fonction retournant void
  */
 #define NO_VALUE
 
@@ -157,15 +157,11 @@
 
 #define catch case
 
-#define catch_no_except \
-    case NO_ERROR:      \
-        break_try;
-
-#define end_try    \
+#define endTry    \
     EXCEPTION = 0; \
     }
 
-#define catch_all_except default
+#define catchAllExcept default
 
 /**
  * @def no_try
@@ -175,52 +171,52 @@
 #define no_try EXCEPTION = 0
 
 /**
- * \~english @def return_except
+ * \~english @def returnExcept
  * \~english @brief Raises an exception to the calling function
  * 
  * \~english In simple use
  * @code
  * fprintf("%d\n", 8);
- * return_except(NO_VALUE);
+ * returnExcept(NO_VALUE);
  * @endcode
  * 
- * \~english @warning It is necessary to perform memory releases before doing a return_except
+ * \~english @warning It is necessary to perform memory releases before doing a returnExcept
  * @code
- * int* tab_int = malloc(sizeof(int)*8);
- * return_except(NO_VALUE);
+ * int* tabInt = malloc(sizeof(int)*8);
+ * returnExcept(NO_VALUE);
  * int* tab2 = malloc(sizeof(int)*10);
  * if (tab2 == NULL)
  * {
- * free(tab_int);
+ * free(tabInt);
  * return;
  * }
  * @endcode
- * \~english Since we have to free the memory we do the return_except manually
+ * \~english Since we have to free the memory we do the returnExcept manually
  * 
  * 
- * \~french @def return_except
+ * \~french @def returnExcept
  * \~french @brief Remonte une exception a la fonction appelante
  * 
  * \~french Dans une utilisation simple
  * @code
  * fprintf("%d\n", 8);
- * return_except(NO_VALUE);
+ * returnExcept(NO_VALUE);
  * @endcode
  * 
- * \~french @warning Il est necessaire de réaliser les liberations memoire avant de faire un return_except
+ * \~french @warning Il est necessaire de réaliser les liberations memoire avant de faire un returnExcept
  * @code
- * int* tab_int = malloc(sizeof(int)*8);
- * return_except(NO_VALUE);
+ * int* tabInt = malloc(sizeof(int)*8);
+ * returnExcept(NO_VALUE);
  * int* tab2 = malloc(sizeof(int)*10);
  * if (tab2 == NULL)
  * {
- *     free(tab_int);
+ *     free(tabInt);
  *     return;
  * }
  * @endcode
- * \~french Vu que l'on doit liberer la memoire on realise le return_except manuelement
+ * \~french Vu que l'on doit liberer la memoire on realise le returnExcept manuelement
  */
-#define return_except(return_value) \
+#define returnExcept(return_value) \
     {                               \
         if (EXCEPTION)                  \
         {                           \

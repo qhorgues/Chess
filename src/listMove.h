@@ -7,20 +7,20 @@ typedef struct Member_list_move *ptrListMove;
 struct Member_list_move
 {
 	ptrListMove next;
-	unsigned char coor;
+	uint8_t coor;
 };
 
 typedef struct ListMove ListMove;
 struct ListMove
 {
-	int (*const pushBack)(ListMove *const, unsigned char const coor);
+	int (*const pushBack)(ListMove *const, uint8_t const coor);
 	void (*const clear)(ListMove *const);
 	
 	ptrListMove listMove;
-	unsigned char const dpt;
-	unsigned char size;
+	uint8_t const dpt;
+	uint8_t size;
 };
 
-extern ListMove initListMove(unsigned char const dpt);
+extern ListMove initListMove(uint8_t const dpt);
 
 #endif

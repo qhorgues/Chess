@@ -4,7 +4,7 @@
 #include "except.h"
 #include "listMove.h"
 
-static int pushBack(ListMove *const list, unsigned char const coor)
+static int pushBack(ListMove *const list, uint8_t const coor)
 {
 	assert(list != NULL && "list cannot be NULL");
 	
@@ -40,7 +40,7 @@ static void clear(ListMove *const list)
 	list->size = 0;
 }
 
-ListMove initListMove(unsigned char const dpt)
+ListMove initListMove(uint8_t const dpt)
 {
 	return (ListMove){&pushBack, &clear, NULL, dpt, 0};
 }
