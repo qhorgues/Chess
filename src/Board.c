@@ -4,9 +4,9 @@
  * @brief Diverse foonction de gestion de l'echequier
  * @version 0.1
  * @date 2022-02-23
- * 
+ *
  * @copyright Copyright (c) 2022 par Quentin Horgues
- * 
+ *
  */
 
 #include <stdio.h>
@@ -15,15 +15,17 @@
 #include "Board.h"
 #include "except.h"
 
-/**
- * \~english @def MAILBOX_64
- * \~english @brief contains the prototype of the mailbox 64
- * \~english @details Mailbox 64 for locating the starting square of a movement on mailbox 120
- * 
- * \~french @def MAILBOX_64
- * \~french @brief contient le prototype de la mailbox 64
- * \~french @details La mailbox 64 pérméttant de localiser la case de départ d'un mouvement sur la mailbox 120
- */
+
+
+ /**
+  * \~english @def MAILBOX_64
+  * \~english @brief contains the prototype of the mailbox 64
+  * \~english @details Mailbox 64 for locating the starting square of a movement on mailbox 120
+  *
+  * \~french @def MAILBOX_64
+  * \~french @brief contient le prototype de la mailbox 64
+  * \~french @details La mailbox 64 pérméttant de localiser la case de départ d'un mouvement sur la mailbox 120
+  */
 #define MAILBOX_64                          \
 	{                                       \
 		21, 22, 23, 24, 25, 26, 27, 28,     \
@@ -36,15 +38,15 @@
 			91, 92, 93, 94, 95, 96, 97, 98  \
 	}
 
-/**
- * \~english @def MAILBOX_120
- * \~english @brief contains the prototype of the mailbox 120
- * \~english @brief The mailbox 120 allows you to manage tray overflows during movements
- * 
- * \~french @def MAILBOX_120
- * \~french @brief contient le prototype de la mailbox 120
- * \~french @details La mailbox 120 permet de gérer les débordements de plateau lors des mouvements
- */
+  /**
+   * \~english @def MAILBOX_120
+   * \~english @brief contains the prototype of the mailbox 120
+   * \~english @brief The mailbox 120 allows you to manage tray overflows during movements
+   *
+   * \~french @def MAILBOX_120
+   * \~french @brief contient le prototype de la mailbox 120
+   * \~french @details La mailbox 120 permet de gérer les débordements de plateau lors des mouvements
+   */
 #define MAILBOX_120                                 \
 	{                                               \
 		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,     \
@@ -61,19 +63,19 @@
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1  \
 	}
 
-#if !defined(NDEBUG) // In the release version the three functions are built statically with a macro function
+#if defined(_DEBUG) // In the release version the three functions are built statically with a macro function
 
-/**
- * \~english @brief returns a one-dimensional index from x and y index for an array of size 64 (8*8)
- * \~english @param x x index
- * \~english @param y y index
- * \~english @return int one-dimensional index
- * 
- * \~french @brief renvoie un indice unidimensionnelle à partir des indices x et y pour un tableau de taille 64 (8*8)
- * \~french @param x indice x
- * \~french @param y indice y
- * \~french @return int indice unidimensionnelle
- */
+   /**
+	* \~english @brief returns a one-dimensional index from x and y index for an array of size 64 (8*8)
+	* \~english @param x x index
+	* \~english @param y y index
+	* \~english @return int one-dimensional index
+	*
+	* \~french @brief renvoie un indice unidimensionnelle à partir des indices x et y pour un tableau de taille 64 (8*8)
+	* \~french @param x indice x
+	* \~french @param y indice y
+	* \~french @return int indice unidimensionnelle
+	*/
 int offSet(uint8_t const x, uint8_t const y)
 {
 	assert(x <= WIDTH_BOARD && "x out of grid");
@@ -85,7 +87,7 @@ int offSet(uint8_t const x, uint8_t const y)
  * \~english @brief Apartir d'un indice unidimensionnelle récupere l'indice multidimensionel x pour un tableau de taille 64 (8*8)
  * \~english @param coor indice unidimensionnelle
  * \~english @return int indice x
- * 
+ *
  * \~french @brief Apartir d'un indice unidimensionnelle récupere l'indice multidimensionel x pour un tableau de taille 64 (8*8)
  * \~french @param coor indice unidimensionnelle
  * \~french @return int indice x
@@ -100,7 +102,7 @@ int getX(uint8_t const coor)
  * \~english @brief Apartir d'un indice unidimensionnelle récupere l'indice multidimensionel y pour un tableau de taille 64 (8*8)
  * \~english @param coor indice unidimensionnelle
  * \~english @return int indice y
- * 
+ *
  * \~french @brief Apartir d'un indice unidimensionnelle récupere l'indice multidimensionel y pour un tableau de taille 64 (8*8)
  * \~french @param coor indice unidimensionnelle
  * \~french @return int indice y
@@ -147,7 +149,7 @@ int getY(uint8_t const coor)
  * \~french @warning passer une grille de taille inferieur a 8*8 ou un pointeur invalide provoque une erreur
  *
  */
-static void posPiece(struct Piece *const restrict grid, enum TypePiece const type, enum ValuePiece const value, uint8_t const minX, uint8_t const maxX, uint8_t const increaseX, uint8_t const minY, uint8_t const maxY, uint8_t const increaseY)
+static void posPiece(struct Piece* const restrict grid, enum TypePiece const type, enum ValuePiece const value, uint8_t const minX, uint8_t const maxX, uint8_t const increaseX, uint8_t const minY, uint8_t const maxY, uint8_t const increaseY)
 {
 	assert(grid != NULL && "grid cannot be NULL");
 	for (uint8_t i = minX; i < maxX; i += increaseX)
@@ -157,11 +159,11 @@ static void posPiece(struct Piece *const restrict grid, enum TypePiece const typ
 			grid[offSet(i, j)].type = type;
 			grid[offSet(i, j)].value = value;
 			if (j <= 1)
-				grid[offSet(i, j)].color = -1;
+				grid[offSet(i, j)].color = Black;
 			else if (j >= 6)
-				grid[offSet(i, j)].color = 1;
+				grid[offSet(i, j)].color = White;
 			else
-				grid[offSet(i, j)].color = 0;
+				grid[offSet(i, j)].color = NoColor;
 			grid[offSet(i, j)].prise_pass = false;
 			grid[offSet(i, j)].moved = false;
 		}
@@ -199,7 +201,7 @@ static void posPiece(struct Piece *const restrict grid, enum TypePiece const typ
  * @endcode
  * \~french Modifie la grille en la reinitialisant au statut de depart d'un plateau d'echec
  */
-void resetGrid(struct Piece(*const restrict grid))
+void resetGrid(struct Piece(* const restrict grid))
 {
 	assert(grid != NULL && "The pointer on the grid must not be NULL");
 	posPiece(grid, None, Val_None, 0, 8, 1, 2, 6, 1);
@@ -222,7 +224,7 @@ void resetGrid(struct Piece(*const restrict grid))
  */
 struct Board initBoard(void)
 {
-	struct Board board = {.mailbox_64 = MAILBOX_64, .mailbox_120 = MAILBOX_120, .nb_white_eliminate = 0, .nb_black_eliminate = 0};
+	struct Board board = { .mailbox_64 = MAILBOX_64, .mailbox_120 = MAILBOX_120, .nb_white_eliminate = 0, .nb_black_eliminate = 0 };
 	resetGrid(board.grid);
 	return board;
 }
@@ -296,25 +298,25 @@ struct Board initBoard(void)
  * @endcode
  * \~french On voit que la dame en D1 (3, 7) est deplace en E8 (4, 0)
  */
-void move(struct Board *const restrict board, uint8_t const dpt, uint8_t const arv)
+void move(struct Board* const restrict board, uint8_t const dpt, uint8_t const arv)
 {
 	assert(dpt < SIZE_BOARD && "Starting coordinate outside the grid");
 	assert(arv < SIZE_BOARD && "Ending coordinate outside the grid");
 	assert(board != NULL && "The board structure cannot be NULL");
 
-	if (board->grid[arv].color == 1)
+	if (board->grid[arv].color == White)
 	{
 		board->eliminate_white[board->nb_white_eliminate] = board->grid[arv];
 		board->nb_white_eliminate++;
 	}
-	else if (board->grid[arv].color == -1)
+	else if (board->grid[arv].color == Black)
 	{
 		board->eliminate_black[board->nb_black_eliminate] = board->grid[arv];
 		board->nb_black_eliminate++;
 	}
 	board->grid[arv] = board->grid[dpt];
 	board->grid[arv].moved = true;
-	board->grid[dpt] = (struct Piece){.color = 0, .type = None, .value = Val_None, .prise_pass = false, .moved = false};
+	board->grid[dpt] = (struct Piece){ .color = NoColor, .type = None, .value = Val_None, .prise_pass = false, .moved = false };
 }
 
 /**
@@ -348,14 +350,14 @@ void move(struct Board *const restrict board, uint8_t const dpt, uint8_t const a
  * W, B,  ...
  * @endcode
  */
-static inline char playerColor(int8_t const player)
+static inline char playerColor(enum PlayerColor const player)
 {
 	assert(player >= -1 && player <= 1 && "player can only be -1, 0 or 1");
-	if (player == 1)
+	if (player == White)
 	{
 		return 'W';
 	}
-	else if (player == -1)
+	else if (player == Black)
 	{
 		return 'B';
 	}
@@ -395,7 +397,7 @@ static inline char playerColor(int8_t const player)
  * \~french @exception EOVERFLOW La valeur de n est supérieure à 2147483647 ou le nombre d’octets nécessaires pour contenir
  * \~french la sortie à l’exclusion de la valeur null de terminaison est supérieur à 2147483647 ( \c fprintf )
  */
-int printBoard(struct Board const *const restrict board, FILE *const restrict out)
+int printBoard(struct Board const* const restrict board, FILE* const restrict out)
 {
 	assert(board != NULL && "board cannot be NULL");
 	assert(out != NULL && "out cannot be NULL");
@@ -441,7 +443,7 @@ int printBoard(struct Board const *const restrict board, FILE *const restrict ou
  * \~french @warning le pointeur sur la structure Board ne doit pas etre invalide
  * \~french @warning le contenu de la structure Board doit etre valide
  */
-static void getPieceMove(struct Board const *const restrict board, ListMove *const restrict list, int8_t const *const tabMove, uint8_t const sizeTabMove)
+static void getPieceMove(struct Board const* const restrict board, ListMove* const restrict list, int8_t const* const tabMove, uint8_t const sizeTabMove)
 {
 	assert(board != NULL && "board cannot be NULL");
 	assert(list != NULL && "list cannot be NULL");
@@ -456,13 +458,13 @@ static void getPieceMove(struct Board const *const restrict board, ListMove *con
 				list->pushBack(list, board->mailbox_120[actu]);
 				try
 				{
-					catch (ERROR_NOT_ENOUGH_SPACE) : 
+					catch (ERROR_NOT_ENOUGH_SPACE) :
 						perror("In getPieceMove to the pushBack call");
-						list->clear(list);
-						break;
-					catchAllExcept :
-						perror("In getPieceMove to the pushBack call");
-						break;
+					list->clear(list);
+					break;
+				catchAllExcept:
+					perror("In getPieceMove to the pushBack call");
+					break;
 				} endTry;
 				actu += tabMove[i];
 			}
@@ -471,13 +473,13 @@ static void getPieceMove(struct Board const *const restrict board, ListMove *con
 				list->pushBack(list, board->mailbox_120[actu]);
 				try
 				{
-					catch (ERROR_NOT_ENOUGH_SPACE) : 
+					catch (ERROR_NOT_ENOUGH_SPACE) :
 						perror("In getPieceMove to the pushBack call");
-						list->clear(list);
-						break;
-					catchAllExcept :
-						perror("In getPieceMove to the pushBack call");
-						break;
+					list->clear(list);
+					break;
+				catchAllExcept:
+					perror("In getPieceMove to the pushBack call");
+					break;
 				} endTry;
 				break;
 			}
@@ -497,14 +499,14 @@ static void getPieceMove(struct Board const *const restrict board, ListMove *con
  *
  * \~english @warning le pointeur sur la structure Board ne doit pas etre invalide
  * \~english @warning le contenu de la structure Board doit etre valide
- * 
+ *
  * @code
  * struct Board board = InitBoard();
  * ListMove list = initListMove(offSet(6, 4));
  * getListMove(&board, &list);
  * @endcode
- * 
- * 
+ *
+ *
  * \~french @brief Complete la liste passe en parametre
  * \~french @details Complete la liste passe en parametre des mouvements de la piece indique a la coordonnes assigne lors de l'appelle de la fonction \c initListMove au prealable
  * \~french @param[in] board Un pointeur sur la structure board
@@ -512,14 +514,14 @@ static void getPieceMove(struct Board const *const restrict board, ListMove *con
  *
  * \~french @warning le pointeur sur la structure Board ne doit pas etre invalide
  * \~french @warning le contenu de la structure Board doit etre valide
- * 
+ *
  * @code
  * struct Board board = InitBoard();
  * ListMove list = initListMove(offSet(6, 4));
  * getListMove(&board, &list);
  * @endcode
  */
-void getListMove(struct Board const *const restrict board, ListMove *const restrict list)
+void getListMove(struct Board const* const restrict board, ListMove* const restrict list)
 {
 	assert(board != NULL && "board cannot be NULL");
 	assert(list != NULL && "list cannot be NULL");
@@ -527,11 +529,11 @@ void getListMove(struct Board const *const restrict board, ListMove *const restr
 	switch (board->grid[list->dpt].type)
 	{
 	case Rook:;
-		int8_t const move_tower[4] = {-10, -1, 1, 10};
+		int8_t const move_tower[4] = { -10, -1, 1, 10 };
 		getPieceMove(board, list, move_tower, 4);
 		break;
 	case Knight:;
-		int8_t const move_knight[8] = {-21, -19, -12, -8, 8, 12, 19, 21};
+		int8_t const move_knight[8] = { -21, -19, -12, -8, 8, 12, 19, 21 };
 		for (int i = 0; i < 8; i++)
 		{
 			int8_t const actu = board->mailbox_64[list->dpt] + move_knight[i];
@@ -540,27 +542,27 @@ void getListMove(struct Board const *const restrict board, ListMove *const restr
 				list->pushBack(list, board->mailbox_120[actu]);
 				try
 				{
-					catch (ERROR_NOT_ENOUGH_SPACE) : 
+					catch (ERROR_NOT_ENOUGH_SPACE) :
 						perror("In getListMove to the pushBack call");
-						list->clear(list);
-						return;
-					catchAllExcept :
-						perror("In getListMove to the pushBack call");
-						break;
+					list->clear(list);
+					return;
+				catchAllExcept:
+					perror("In getListMove to the pushBack call");
+					break;
 				} endTry;
 			}
 		}
 		break;
 	case Bishop:;
-		int8_t const move_bishop[4] = {-11, -9, 9, 11};
+		int8_t const move_bishop[4] = { -11, -9, 9, 11 };
 		getPieceMove(board, list, move_bishop, 4);
 		break;
 	case Queen:;
-		int8_t const move_queen[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
+		int8_t const move_queen[8] = { -11, -10, -9, -1, 1, 9, 10, 11 };
 		getPieceMove(board, list, move_queen, 8);
 		break;
 	case King:;
-		int8_t const move_king[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
+		int8_t const move_king[8] = { -11, -10, -9, -1, 1, 9, 10, 11 };
 		for (int i = 0; i < 8; i++)
 		{
 			int8_t const actu = board->mailbox_64[list->dpt] + move_king[i];
@@ -569,13 +571,13 @@ void getListMove(struct Board const *const restrict board, ListMove *const restr
 				list->pushBack(list, board->mailbox_120[actu]);
 				try
 				{
-					catch (ERROR_NOT_ENOUGH_SPACE) : 
+					catch (ERROR_NOT_ENOUGH_SPACE) :
 						perror("In getListMove to the pushBack call");
-						list->clear(list);
-						return;
-					catchAllExcept :
-						perror("In getListMove to the pushBack call");
-						break;
+					list->clear(list);
+					return;
+				catchAllExcept:
+					perror("In getListMove to the pushBack call");
+					break;
 				} endTry;
 			}
 		}
@@ -585,7 +587,7 @@ void getListMove(struct Board const *const restrict board, ListMove *const restr
 		int8_t const color = board->grid[list->dpt].color;
 		uint8_t const dpt = board->mailbox_64[list->dpt];
 		uint8_t const advance = dpt + color * (-10);
-		uint8_t const eat[2] = {board->mailbox_64[list->dpt] + color * (-11), board->mailbox_64[list->dpt] + color * (-9)};
+		uint8_t const eat[2] = { board->mailbox_64[list->dpt] + color * (-11), board->mailbox_64[list->dpt] + color * (-9) };
 		if (board->mailbox_120[advance] != -1 && board->grid[board->mailbox_120[advance]].color == 0)
 		{
 			list->pushBack(list, board->mailbox_120[advance]);
@@ -594,13 +596,13 @@ void getListMove(struct Board const *const restrict board, ListMove *const restr
 				list->pushBack(list, board->mailbox_120[advance + color * (-10)]);
 				try
 				{
-					catch (ERROR_NOT_ENOUGH_SPACE) : 
+					catch (ERROR_NOT_ENOUGH_SPACE) :
 						perror("In getListMove to the pushBack call");
-						list->clear(list);
-						return;
-					catchAllExcept :
-						perror("In getListMove to the pushBack call");
-						break;
+					list->clear(list);
+					return;
+				catchAllExcept:
+					perror("In getListMove to the pushBack call");
+					break;
 				} endTry;
 			}
 		}
@@ -611,13 +613,13 @@ void getListMove(struct Board const *const restrict board, ListMove *const restr
 				list->pushBack(list, board->mailbox_120[eat[i]]);
 				try
 				{
-					catch (ERROR_NOT_ENOUGH_SPACE) : 
+					catch (ERROR_NOT_ENOUGH_SPACE) :
 						perror("In getListMove to the pushBack call");
-						list->clear(list);
-						return;
-					catchAllExcept :
-						perror("In getListMove to the pushBack call");
-						break;
+					list->clear(list);
+					return;
+				catchAllExcept:
+					perror("In getListMove to the pushBack call");
+					break;
 				} endTry;
 			}
 			else if (board->mailbox_120[eat[i]] != -1 && board->grid[board->mailbox_120[eat[i]]].color == 0 && board->grid[board->mailbox_120[eat[i] + 10 * color]].prise_pass == true)
@@ -625,13 +627,13 @@ void getListMove(struct Board const *const restrict board, ListMove *const restr
 				list->pushBack(list, board->mailbox_120[eat[i]]);
 				try
 				{
-					catch (ERROR_NOT_ENOUGH_SPACE) : 
+					catch (ERROR_NOT_ENOUGH_SPACE) :
 						perror("In getListMove to the pushBack call");
-						list->clear(list);
-						return;
-					catchAllExcept :
-						perror("In getListMove to the pushBack call");
-						break;
+					list->clear(list);
+					return;
+				catchAllExcept:
+					perror("In getListMove to the pushBack call");
+					break;
 				} endTry;
 			}
 		}
@@ -641,44 +643,100 @@ void getListMove(struct Board const *const restrict board, ListMove *const restr
 	}
 }
 
+uint8_t findKing(struct Board const* const restrict board, enum PlayerColor color)
+{
+	for (uint8_t i = 0; i < SIZE_BOARD; i++)
+	{
+		if (board->grid[i].color == color && board->grid[i].type == King)
+		{
+			return i;
+		}
+	}
+	return UNDEFINED_COORDINATES;
+}
+
+bool check(struct Board* const restrict board, enum PlayerColor color, uint8_t coorKing)
+{
+	if (coorKing >= UNDEFINED_COORDINATES)
+	{
+		assert(color != NoColor && "It is necessary to define the colour of the king if the coordinates are not defined");
+		coorKing = findKing(board, color);
+		assert(coorKing != UNDEFINED_COORDINATES && "No king in grid");
+	}
+	else if (color == NoColor)
+	{
+		assert(board->grid[coorKing].type == King && "If the square indicated is not a king you must indicate the colour");
+		color = board->grid[coorKing].color;
+	}
+	struct Piece* const currentKing = &board->grid[coorKing];
+	enum TypePiece const originalPiece = currentKing->type;
+	enum TypePiece const listPiece[6] = { King, Rook, Bishop, Knight, Pawn };
+	for (uint8_t i = 0; i < 6; i++)
+	{
+		currentKing->type = listPiece[i];
+		ListMove listCurrentType = initListMove(coorKing);
+		getListMove(board, &listCurrentType);
+
+		ptrListMove ptrListCurrentType = listCurrentType.listMove;
+		while (ptrListCurrentType != NULL)
+		{
+			if (board->grid[ptrListCurrentType->coor].color == color * -1)
+			{
+				struct Piece const* const currentCase = &board->grid[ptrListCurrentType->coor];
+				if (listPiece[i] == currentCase->type || ((listPiece[i] == Rook || listPiece[i] == Bishop) && currentCase->type == Queen))
+				{
+					listCurrentType.clear(&listCurrentType);
+					currentKing->type = originalPiece;
+					return true;
+				}
+			}
+			ptrListCurrentType = ptrListCurrentType->next;
+		}
+
+		listCurrentType.clear(&listCurrentType);
+	}
+	currentKing->type = originalPiece;
+	return false;
+}
+
 /**
  * @brief La fonction permettant de completer la liste des mouvements du roi si il peut roquer
  * @details ajoute a la liste de mouvement les cases d'arrivées du roi après un roque
- * 
+ *
  * @param[in] board La structure board
  * @param[in, out] list La liste à compléter
- * 
+ *
  */
-void castling(struct Board const *const restrict board, ListMove *const restrict list, uint8_t const coor_king)
-{
-	uint8_t const startedPositionKingWhite = 60;
-	uint8_t const startedPositionKingBlack = 4;
-	 
-	if ( /*!Check(...) && */(coor_king == startedPositionKingWhite || coor_king == startedPositionKingBlack) && board->grid[coor_king].moved == false)
-	{
-		uint8_t index_min = coor_king+1;
-		uint8_t index_max = coor_king-1;
-		if (!board->grid[coor_king-4].moved)
-		{
-			index_min = coor_king-3;
-		}
-		if (!board->grid[coor_king+3].moved)
-		{
-			index_max = coor_king+2;
-		}
-		uint8_t result = 0b0011;
-		for (uint8_t i = index_min; i <= index_max; i++)
-		{
-			if (board->grid[i].type != None || (i > coor_king-3 && i < coor_king+2 /*&& !Check(..., coor_king) && */) )
-			{
-				if (i < coor_king ||  (i > coor_king-3 /* && !Check(..., coor_king) */ ) )
-				{
-					result &= 2; // 1 << 1
-					i = coor_king+1;
-					continue;
-				}
-				else if ()
-			}
-		}
-	}
-}
+ /* void castling(struct Board const *const restrict board, ListMove *const restrict list, uint8_t const coorKing)
+ {
+	 uint8_t const startedPositionKingWhite = 60;
+	 uint8_t const startedPositionKingBlack = 4;
+
+	 if ( !Check(...) && (coorKing == startedPositionKingWhite || coorKing == startedPositionKingBlack) && board->grid[coorKing].moved == false)
+	 {
+		 uint8_t index_min = coorKing+1;
+		 uint8_t index_max = coorKing-1;
+		 if (!board->grid[coorKing-4].moved)
+		 {
+			 index_min = coorKing-3;
+		 }
+		 if (!board->grid[coorKing+3].moved)
+		 {
+			 index_max = coorKing+2;
+		 }
+		 uint8_t result = 3;
+		 for (uint8_t i = index_min; i <= index_max; i++)
+		 {
+			 if (board->grid[i].type != None || (i > coorKing-3 && i < coorKing+2 && !Check(..., coorKing) && ) )
+			 {
+				 if (i < coorKing ||  (i > coorKing-3 && !Check(..., coorKing) ) )
+				 {
+					 result &= 2; // 1 << 1
+					 i = coorKing+1;
+					 continue;
+				 }
+				 else if ()
+			 }
+		 }
+	 }
+ } */

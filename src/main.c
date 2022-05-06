@@ -5,6 +5,7 @@
 
 int main(void)
 {
+	int a;
 	struct Board board = initBoard();
     move(&board, offSet( 5, 1), offSet(5, 3));
     move(&board, offSet( 4, 6), offSet(4, 3));
@@ -20,5 +21,9 @@ int main(void)
 	}
 	list.clear(&list);
 
+	printf("check 1 : %d\n", check(&board, Black, UNDEFINED_COORDINATES));
+	move(&board, offSet( 3, 7), offSet(3, 0));
+	printf("check 2 : %d\n", check(&board, Black, UNDEFINED_COORDINATES));
+	printBoard(&board, stdout);
     return 0;
 }

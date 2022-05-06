@@ -8,9 +8,19 @@
 
 #define SIZE_BOARD 64
 #define WIDTH_BOARD 8
+#define UNDEFINED_COORDINATES 64
 
-
-
+/**
+ * @enum PlayerColor
+ * @brief Représente la couleur d'un joueur -1 pour Black et 1 pour White
+ * 
+ */
+enum PlayerColor
+{
+    Black = -1,
+    NoColor = 0,
+    White = 1
+};
 
 /**
  * @enum TypePiece
@@ -55,7 +65,7 @@ struct Piece
 {
     enum TypePiece type;
     enum ValuePiece value;
-    int8_t color;
+    enum PlayerColor color;
     bool prise_pass;
     bool moved;
 };
@@ -137,16 +147,17 @@ extern struct Board initBoard(void);
 extern void move(struct Board *const restrict board, uint8_t const dpt, uint8_t const arv);
 extern int printBoard(struct Board const *const restrict board, FILE *restrict out);
 extern void getListMove(struct Board const *const restrict board, ListMove *const restrict list);
+extern bool check(struct Board *const restrict board, enum PlayerColor color, uint8_t coorKing);
 
 
-#if defined(NDEBUG)
-	#define offSet(x, y) (y * WIDTH_BOARD + x)
-	#define getX(coor) (coor % WIDTH_BOARD)
-	#define getY(coor) (coor / WIDTH_BOARD)
-#else
+#if defined(_DEBUG)
 	extern int offSet(uint8_t const x, uint8_t const y);
 	extern int getX(uint8_t const coor);
 	extern int getY(uint8_t const coor);
+#else
+	#define offSet(x, y) (y * WIDTH_BOARD + x)
+	#define getX(coor) (coor % WIDTH_BOARD)
+	#define getY(coor) (coor / WIDTH_BOARD)
 #endif
 
 #endif
