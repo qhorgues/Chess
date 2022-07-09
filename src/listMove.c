@@ -1,8 +1,8 @@
 #include <malloc.h>
 #include <assert.h>
 #include <stdint.h>
-#include "except.h"
-#include "listMove.h"
+#include "../include/except.h"
+#include "../include/listMove.h"
 
 static int pushBack(ListMove *const list, uint8_t const coor)
 {

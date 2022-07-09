@@ -1,0 +1,22 @@
+#ifndef VERSION_H
+#define VERSION_H
+
+#define VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define VERSION_MINOR @PROJECT_VERSION_MINOR@
+#define VERSION_PATCH @PROJECT_VERSION_PATCH@
+
+typedef struct Chess_version
+{
+    int major;
+    int minor;
+    int patch;
+} Chess_version;
+
+static inline void getVersion(Chess_version *const version)
+{
+    version->major = VERSION_MAJOR;
+    version->minor = VERSION_MINOR;
+    version->patch = VERSION_PATCH;
+}
+
+#endif

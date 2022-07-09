@@ -12,8 +12,8 @@
 #include <stdio.h>
 #include <assert.h>
 #include <stdbool.h>
-#include "Board.h"
-#include "except.h"
+#include "../include/Board.h"
+#include "../include/except.h"
 
 
 
@@ -542,8 +542,8 @@ void getListMove(struct Board const* const restrict board, ListMove* const restr
 				list->pushBack(list, board->mailbox_120[actu]);
 				try
 				{
-					catch (ERROR_NOT_ENOUGH_SPACE) :
-						perror("In getListMove to the pushBack call");
+				catch (ERROR_NOT_ENOUGH_SPACE) :
+					perror("In getListMove to the pushBack call");
 					list->clear(list);
 					return;
 				catchAllExcept:
