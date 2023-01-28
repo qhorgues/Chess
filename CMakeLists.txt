@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.20)
 
-project (forward_list LANGUAGES C VERSION 1.0)
+project (Chess LANGUAGES C VERSION 1.0)
 
 include(CTest)
 enable_testing()
