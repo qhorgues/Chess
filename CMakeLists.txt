@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.20)
 
-project (forward_list LANGUAGES C VERSION 1.0)
+project (Chess LANGUAGES C VERSION 1.0)
 
 include(CTest)
 enable_testing()
@@ -12,9 +12,15 @@ set_choice (CMAKE_BUILD_TYPE "Debug;Release;MinSizeRel;RelWithDebInfo" "Debug" "
 
 set (SRCS
 	src/main.c
+	src/Board.c
+	src/listMove.c
 )
 
 set (HEADERS
+	include/Board.h
+	include/except.h
+	include/listMove.h
+	include/version.h
 )
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
