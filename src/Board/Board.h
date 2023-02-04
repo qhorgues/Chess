@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include "ListMove.h"
+#include "../listMove/listMove.h"
 
 #define SIZE_BOARD 64
 #define WIDTH_BOARD 8

@@ -12,14 +12,14 @@ set_choice (CMAKE_BUILD_TYPE "Debug;Release;MinSizeRel;RelWithDebInfo" "Debug" "
 
 set (SRCS
 	src/main.c
-	src/Board.c
-	src/listMove.c
+	src/Board/Board.c
+	src/listMove/listMove.c
 )
 
 set (HEADERS
-	include/Board.h
+	src/Board/Board.h
+	src/listMove/listMove.h
 	include/except.h
-	include/listMove.h
 	include/version.h
 )
 
@@ -28,8 +28,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 set (CMAKE_C_STANDARD 17)
 set (CMAKE_C_STANDARD_REQUIRED ON)
 
-add_executable (${PROJECT_NAME} STATIC ${SRCS} ${HEADERS})
-set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER ${HEADERS})
+add_executable (${PROJECT_NAME} ${SRCS} ${HEADERS})
 set_target_warnings(${PROJECT_NAME})
 
 include(GNUInstallDirs)

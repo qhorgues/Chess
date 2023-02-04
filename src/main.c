@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "../include/Board.h"
-#include "../include/listMove.h"
+#include "Board/Board.h"
+#include "listMove/listMove.h"
 
 
 int main(void)
