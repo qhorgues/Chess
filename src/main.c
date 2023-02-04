@@ -5,7 +5,6 @@
 
 int main(void)
 {
-	int a;
 	struct Board board = initBoard();
     move(&board, offSet( 5, 1), offSet(5, 3));
     move(&board, offSet( 4, 6), offSet(4, 3));
