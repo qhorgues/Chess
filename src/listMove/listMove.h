@@ -12,15 +12,13 @@ struct Member_list_move
 
 typedef struct ListMove ListMove;
 struct ListMove
-{
-	int ( *pushBack)(ListMove *, int coor);
-	void ( *clear)(ListMove *);
-	
+{	
 	ptrListMove listMove;
 	int dpt;
 	int size;
 };
 
-extern ListMove initListMove(int dpt);
-
+ListMove initListMove(int dpt);
+int ListMove_pushBack(ListMove  *list, int coor);
+void ListMove_clear(ListMove  *list);
 #endif

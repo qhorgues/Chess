@@ -142,18 +142,18 @@ struct Board
 
 };
 
-extern void resetGrid(struct Piece *grid);
-extern struct Board initBoard(void);
-extern void move(struct Board *board, int dpt, int arv);
-extern int printBoard(struct Board const *board, FILE *out);
-extern void getListMove(struct Board const *board, ListMove *list);
-extern bool check(struct Board *board, enum PlayerColor color, int coorKing);
+ void resetGrid(struct Piece *grid);
+ struct Board initBoard(void);
+ void move(struct Board *board, int dpt, int arv);
+ int printBoard(struct Board const *board, FILE *out);
+ void getListMove(struct Board const *board, ListMove *list);
+ bool check(struct Board *board, enum PlayerColor color, int coorKing);
 
 
 #if defined(_DEBUG)
-	extern int offSet(int x, int y);
-	extern int getX(int coor);
-	extern int getY(int coor);
+	 int offSet(int x, int y);
+	 int getX(int coor);
+	 int getY(int coor);
 #else
 	#define offSet(x, y) (y * WIDTH_BOARD + x)
 	#define getX(coor) (coor % WIDTH_BOARD)

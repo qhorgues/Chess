@@ -4,7 +4,7 @@
 #include "../include/except.h"
 #include "listMove.h"
 
-static int pushBack(ListMove  *list, int coor)
+int ListMove_pushBack(ListMove  *list, int coor)
 {
 	assert(list != NULL && "list cannot be NULL");
 	
@@ -27,7 +27,7 @@ static int pushBack(ListMove  *list, int coor)
 	return 0;
 }
 
-static void clear(ListMove  *list)
+void ListMove_clear(ListMove  *list)
 {
 	ptrListMove next = list->listMove;
 	while (next != NULL) 
@@ -42,5 +42,5 @@ static void clear(ListMove  *list)
 
 ListMove initListMove(int dpt)
 {
-	return (ListMove){&pushBack, &clear, NULL, dpt, 0};
+	return (ListMove){NULL, dpt, 0};
 }
