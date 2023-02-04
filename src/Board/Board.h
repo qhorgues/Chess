@@ -98,7 +98,7 @@ struct Board
      * 91, 92, 93, 94, 95, 96, 97, 98 
      * @endcode
      */
-    uint8_t const mailbox_64[64];
+    int const mailbox_64[64];
 
     /**
      * 
@@ -118,7 +118,7 @@ struct Board
      * -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
      * @endcode
      */
-    int8_t const mailbox_120[120];
+    int const mailbox_120[120];
     
     /**
      * @brief Le tableau de toutes les pieces blanches eliminées 
@@ -133,27 +133,27 @@ struct Board
     /**
      * @brief Le nombre de piece blanche eliminées permettant de toujours indexer a des valeurs initialisées 
      */
-    uint8_t nb_white_eliminate;
+    int nb_white_eliminate;
 
     /**
      * @brief Le nombre de piece noir eliminées permettant de toujours indexer a des valeurs initialisées 
      */
-    uint8_t nb_black_eliminate;
+    int nb_black_eliminate;
 
 };
 
-extern void resetGrid(struct Piece *const restrict grid);
+extern void resetGrid(struct Piece *grid);
 extern struct Board initBoard(void);
-extern void move(struct Board *const restrict board, uint8_t const dpt, uint8_t const arv);
-extern int printBoard(struct Board const *const restrict board, FILE *restrict out);
-extern void getListMove(struct Board const *const restrict board, ListMove *const restrict list);
-extern bool check(struct Board *const restrict board, enum PlayerColor color, uint8_t coorKing);
+extern void move(struct Board *board, int dpt, int arv);
+extern int printBoard(struct Board const *board, FILE *out);
+extern void getListMove(struct Board const *board, ListMove *list);
+extern bool check(struct Board *board, enum PlayerColor color, int coorKing);
 
 
 #if defined(_DEBUG)
-	extern int offSet(uint8_t const x, uint8_t const y);
-	extern int getX(uint8_t const coor);
-	extern int getY(uint8_t const coor);
+	extern int offSet(int x, int y);
+	extern int getX(int coor);
+	extern int getY(int coor);
 #else
 	#define offSet(x, y) (y * WIDTH_BOARD + x)
 	#define getX(coor) (coor % WIDTH_BOARD)

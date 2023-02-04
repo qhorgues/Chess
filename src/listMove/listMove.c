@@ -2,9 +2,9 @@
 #include <assert.h>
 #include <stdint.h>
 #include "../include/except.h"
-#include "../include/listMove.h"
+#include "listMove.h"
 
-static int pushBack(ListMove *const list, uint8_t const coor)
+static int pushBack(ListMove  *list, int coor)
 {
 	assert(list != NULL && "list cannot be NULL");
 	
@@ -27,7 +27,7 @@ static int pushBack(ListMove *const list, uint8_t const coor)
 	return 0;
 }
 
-static void clear(ListMove *const list)
+static void clear(ListMove  *list)
 {
 	ptrListMove next = list->listMove;
 	while (next != NULL) 
@@ -40,7 +40,7 @@ static void clear(ListMove *const list)
 	list->size = 0;
 }
 
-ListMove initListMove(uint8_t const dpt)
+ListMove initListMove(int dpt)
 {
 	return (ListMove){&pushBack, &clear, NULL, dpt, 0};
 }
