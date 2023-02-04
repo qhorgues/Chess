@@ -78,3 +78,5 @@ Release
 *.dir
 x64
 win32
+
+build
