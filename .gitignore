@@ -79,4 +79,4 @@ Release
 x64
 win32
 
-./build
+build/
