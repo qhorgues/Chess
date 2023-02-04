@@ -146,7 +146,7 @@ struct Board
  struct Board initBoard(void);
  void move(struct Board *board, int dpt, int arv);
  int printBoard(struct Board const *board, FILE *out);
- void getListMove(struct Board const *board, ListMove *list);
+ void ListMove_getMove(struct Board const *board, ListMove *list);
  bool check(struct Board *board, enum PlayerColor color, int coorKing);
 
 

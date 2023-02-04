@@ -40,7 +40,7 @@ void ListMove_clear(ListMove  *list)
 	list->size = 0;
 }
 
-ListMove initListMove(int dpt)
+ListMove ListMove_init(int dpt)
 {
 	return (ListMove){NULL, dpt, 0};
 }

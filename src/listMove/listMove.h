@@ -18,7 +18,7 @@ struct ListMove
 	int size;
 };
 
-ListMove initListMove(int dpt);
+ListMove ListMove_init(int dpt);
 int ListMove_pushBack(ListMove  *list, int coor);
 void ListMove_clear(ListMove  *list);
 #endif

@@ -455,12 +455,12 @@ static void getPieceMove(struct Board const *board, ListMove *list, int const*ta
 		{
 			if (board->grid[board->mailbox_120[actu]].color == 0)
 			{
-				list->pushBack(list, board->mailbox_120[actu]);
+				ListMove_pushBack(list, board->mailbox_120[actu]);
 				try
 				{
 					catch (ERROR_NOT_ENOUGH_SPACE) :
 						perror("In getPieceMove to the pushBack call");
-					list->clear(list);
+					ListMove_clear(list);
 					break;
 				catchAllExcept:
 					perror("In getPieceMove to the pushBack call");
@@ -470,12 +470,12 @@ static void getPieceMove(struct Board const *board, ListMove *list, int const*ta
 			}
 			else if (board->grid[board->mailbox_120[actu]].color == board->grid[list->dpt].color * -1)
 			{
-				list->pushBack(list, board->mailbox_120[actu]);
+				ListMove_pushBack(list, board->mailbox_120[actu]);
 				try
 				{
 					catch (ERROR_NOT_ENOUGH_SPACE) :
 						perror("In getPieceMove to the pushBack call");
-					list->clear(list);
+					ListMove_clear(list);
 					break;
 				catchAllExcept:
 					perror("In getPieceMove to the pushBack call");
@@ -493,7 +493,7 @@ static void getPieceMove(struct Board const *board, ListMove *list, int const*ta
 
 /**
  * \~english @brief Complete la liste passe en parametre
- * \~english @details Complete la liste passe en parametre des mouvements de la piece indique a la coordonnes assigne lors de l'appelle de la fonction \c initListMove au prealable
+ * \~english @details Complete la liste passe en parametre des mouvements de la piece indique a la coordonnes assigne lors de l'appelle de la fonction \c ListMove_init au prealable
  * \~english @param[in] board Un pointeur sur la structure board
  * \~english @param[in, out] list Un liste initialisée vide que la fonction va completer
  *
@@ -502,13 +502,13 @@ static void getPieceMove(struct Board const *board, ListMove *list, int const*ta
  *
  * @code
  * struct Board board = InitBoard();
- * ListMove list = initListMove(offSet(6, 4));
- * getListMove(&board, &list);
+ * ListMove list = ListMove_init(offSet(6, 4));
+ * ListMove_getMove(&board, &list);
  * @endcode
  *
  *
  * \~french @brief Complete la liste passe en parametre
- * \~french @details Complete la liste passe en parametre des mouvements de la piece indique a la coordonnes assigne lors de l'appelle de la fonction \c initListMove au prealable
+ * \~french @details Complete la liste passe en parametre des mouvements de la piece indique a la coordonnes assigne lors de l'appelle de la fonction \c ListMove_init au prealable
  * \~french @param[in] board Un pointeur sur la structure board
  * \~french @param[in, out] list Un liste initialisée vide que la fonction va completer
  *
@@ -517,11 +517,11 @@ static void getPieceMove(struct Board const *board, ListMove *list, int const*ta
  *
  * @code
  * struct Board board = InitBoard();
- * ListMove list = initListMove(offSet(6, 4));
- * getListMove(&board, &list);
+ * ListMove list = ListMove_init(offSet(6, 4));
+ * ListMove_getMove(&board, &list);
  * @endcode
  */
-void getListMove(struct Board const *board, ListMove *list)
+void ListMove_getMove(struct Board const *board, ListMove *list)
 {
 	assert(board != NULL && "board cannot be NULL");
 	assert(list != NULL && "list cannot be NULL");
@@ -539,15 +539,15 @@ void getListMove(struct Board const *board, ListMove *list)
 			int const actu = board->mailbox_64[list->dpt] + move_knight[i];
 			if (board->mailbox_120[actu] != -1 && board->grid[board->mailbox_120[actu]].color != board->grid[list->dpt].color)
 			{
-				list->pushBack(list, board->mailbox_120[actu]);
+				ListMove_pushBack(list, board->mailbox_120[actu]);
 				try
 				{
 				catch (ERROR_NOT_ENOUGH_SPACE) :
-					perror("In getListMove to the pushBack call");
-					list->clear(list);
+					perror("In ListMove_getMove to the pushBack call");
+					ListMove_clear(list);
 					return;
 				catchAllExcept:
-					perror("In getListMove to the pushBack call");
+					perror("In ListMove_getMove to the pushBack call");
 					break;
 				} endTry;
 			}
@@ -568,15 +568,15 @@ void getListMove(struct Board const *board, ListMove *list)
 			int const actu = board->mailbox_64[list->dpt] + move_king[i];
 			if (board->mailbox_120[actu] != -1 && board->grid[board->mailbox_120[actu]].color != board->grid[list->dpt].color)
 			{
-				list->pushBack(list, board->mailbox_120[actu]);
+				ListMove_pushBack(list, board->mailbox_120[actu]);
 				try
 				{
 					catch (ERROR_NOT_ENOUGH_SPACE) :
-						perror("In getListMove to the pushBack call");
-					list->clear(list);
+						perror("In ListMove_getMove to the pushBack call");
+					ListMove_clear(list);
 					return;
 				catchAllExcept:
-					perror("In getListMove to the pushBack call");
+					perror("In ListMove_getMove to the pushBack call");
 					break;
 				} endTry;
 			}
@@ -590,18 +590,18 @@ void getListMove(struct Board const *board, ListMove *list)
 		int const eat[2] = { board->mailbox_64[list->dpt] + color * (-11), board->mailbox_64[list->dpt] + color * (-9) };
 		if (board->mailbox_120[advance] != -1 && board->grid[board->mailbox_120[advance]].color == 0)
 		{
-			list->pushBack(list, board->mailbox_120[advance]);
+			ListMove_pushBack(list, board->mailbox_120[advance]);
 			if (board->grid[list->dpt].moved == false && board->grid[board->mailbox_120[advance + color * (-10)]].color == 0)
 			{
-				list->pushBack(list, board->mailbox_120[advance + color * (-10)]);
+				ListMove_pushBack(list, board->mailbox_120[advance + color * (-10)]);
 				try
 				{
 					catch (ERROR_NOT_ENOUGH_SPACE) :
-						perror("In getListMove to the pushBack call");
-					list->clear(list);
+						perror("In ListMove_getMove to the pushBack call");
+					ListMove_clear(list);
 					return;
 				catchAllExcept:
-					perror("In getListMove to the pushBack call");
+					perror("In ListMove_getMove to the pushBack call");
 					break;
 				} endTry;
 			}
@@ -610,29 +610,29 @@ void getListMove(struct Board const *board, ListMove *list)
 		{
 			if (board->mailbox_120[eat[i]] != -1 && board->grid[board->mailbox_120[eat[i]]].color == color * -1)
 			{
-				list->pushBack(list, board->mailbox_120[eat[i]]);
+				ListMove_pushBack(list, board->mailbox_120[eat[i]]);
 				try
 				{
 					catch (ERROR_NOT_ENOUGH_SPACE) :
-						perror("In getListMove to the pushBack call");
-					list->clear(list);
+						perror("In ListMove_getMove to the pushBack call");
+					ListMove_clear(list);
 					return;
 				catchAllExcept:
-					perror("In getListMove to the pushBack call");
+					perror("In ListMove_getMove to the pushBack call");
 					break;
 				} endTry;
 			}
 			else if (board->mailbox_120[eat[i]] != -1 && board->grid[board->mailbox_120[eat[i]]].color == 0 && board->grid[board->mailbox_120[eat[i] + 10 * color]].prise_pass == true)
 			{
-				list->pushBack(list, board->mailbox_120[eat[i]]);
+				ListMove_pushBack(list, board->mailbox_120[eat[i]]);
 				try
 				{
 					catch (ERROR_NOT_ENOUGH_SPACE) :
-						perror("In getListMove to the pushBack call");
-					list->clear(list);
+						perror("In ListMove_getMove to the pushBack call");
+					ListMove_clear(list);
 					return;
 				catchAllExcept:
-					perror("In getListMove to the pushBack call");
+					perror("In ListMove_getMove to the pushBack call");
 					break;
 				} endTry;
 			}
@@ -675,8 +675,8 @@ bool check(struct Board *board, enum PlayerColor color, int coorKing)
 	for (int i = 0; i < 6; i++)
 	{
 		currentKing->type = listPiece[i];
-		ListMove listCurrentType = initListMove(coorKing);
-		getListMove(board, &listCurrentType);
+		ListMove listCurrentType = ListMove_init(coorKing);
+		ListMove_getMove(board, &listCurrentType);
 
 		ptrListMove ptrListCurrentType = listCurrentType.listMove;
 		while (ptrListCurrentType != NULL)
@@ -686,7 +686,7 @@ bool check(struct Board *board, enum PlayerColor color, int coorKing)
 				struct Piece *currentCase = &board->grid[ptrListCurrentType->coor];
 				if (listPiece[i] == currentCase->type || ((listPiece[i] == Rook || listPiece[i] == Bishop) && currentCase->type == Queen))
 				{
-					listCurrentType.clear(&listCurrentType);
+					ListMove_clear(&listCurrentType);
 					currentKing->type = originalPiece;
 					return true;
 				}
@@ -694,7 +694,7 @@ bool check(struct Board *board, enum PlayerColor color, int coorKing)
 			ptrListCurrentType = ptrListCurrentType->next;
 		}
 
-		listCurrentType.clear(&listCurrentType);
+		ListMove_clear(&listCurrentType);
 	}
 	currentKing->type = originalPiece;
 	return false;
