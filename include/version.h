@@ -12,7 +12,7 @@ typedef struct Chess_version
     int patch;
 } Chess_version;
 
-static inline void getVersion(Chess_version *const version)
+static inline void getVersion(Chess_version  *version)
 {
     version->major = VERSION_MAJOR;
     version->minor = VERSION_MINOR;
