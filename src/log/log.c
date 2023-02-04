@@ -41,6 +41,8 @@ void close_log(void)
     if (log_is_open)
     {
         fclose(log_file);
+        log_file = NULL;
+        log_is_open = false;
     }
 }
 #endif
@@ -51,7 +53,7 @@ void _test(Error_type type_error, int condition, const char* str_condition, cons
 #ifndef NDEBUG
     if (log_is_open)
     {
-        fprintf(log_file, "[%s] : %s is %s  ---- %s line : %d, file %s\n", error_str[type_error], str_condition, (condition) ? "true" : "false", message, line, file);
+        fprintf(log_file, "[%s] : %s is %s  ---- %s line : %d, file %s\n", (!condition) ? error_str[type_error] : "Success", str_condition, (!condition) ? "true" : "false", (!condition) ? message : "", line, file);
     }
 #else
     UNUSED(str_condition);
@@ -59,7 +61,7 @@ void _test(Error_type type_error, int condition, const char* str_condition, cons
     UNUSED(line);
     UNUSED(file);
 #endif
-    if (type_error == FATAL_ERROR && condition)
+    if (type_error == FATAL_ERROR && !condition)
     {
         exit(-1);
     }
