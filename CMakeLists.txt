@@ -12,9 +12,11 @@ set_choice (CMAKE_BUILD_TYPE "Debug;Release;MinSizeRel;RelWithDebInfo" "Debug" "
 
 set (SRCS
 	src/main.c
+	src/log/log.c
 )
 
 set (HEADERS
+	src/log/log.h
 )
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -22,7 +24,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 set (CMAKE_C_STANDARD 17)
 set (CMAKE_C_STANDARD_REQUIRED ON)
 
-add_executable (${PROJECT_NAME} STATIC ${SRCS} ${HEADERS})
+add_executable (${PROJECT_NAME} ${SRCS} ${HEADERS})
 set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER ${HEADERS})
 set_target_warnings(${PROJECT_NAME})
 
