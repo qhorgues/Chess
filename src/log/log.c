@@ -85,6 +85,7 @@ void _test(Error_type type_error, int condition, const char* str_condition, cons
     UNUSED(message);
     UNUSED(line);
     UNUSED(file);
+    UNUSED(func);
 #endif
     if (type_error == FATAL_ERROR && !condition)
     {
