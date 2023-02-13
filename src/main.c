@@ -2,7 +2,7 @@
 #include "Board/Board.h"
 #include "listMove/listMove.h"
 #include "log/log.h"
-
+#include <assert.h>
 
 int main(void)
 {
@@ -14,8 +14,7 @@ int main(void)
 
 	board.grid[offSet(5, 3)].prise_pass = true;
 
-    int ret_value = printBoard(&board, stdout);
-    test(WARN, ret_value != 0, "Fail on print board");
+    test(ERROR, printBoard(&board, stdout) == 0, DEFAULT_MESSAGE);
 
 	ListMove list = ListMove_init(offSet(4, 3));
 
