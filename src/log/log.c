@@ -3,11 +3,17 @@
 #include "log.h"
 
 #define UNUSED(x) (void)(x)
+#define BOOL_ALPHA(x) ( (x) ? "true" : "false" )
 
 #ifndef NDEBUG
 
 #include <stdarg.h>
-#include <sys/stat.h>
+
+#ifdef WIN32
+    #include <fileapi.h>
+#else
+    #include <sys/stat.h>
+#endif
 
 static const char* error_str[] = {"Status", "Warn", "Error", "Fatal Error"};
 static bool log_is_open = false;
@@ -15,7 +21,12 @@ static FILE* log_file = NULL;
 
 void open_log(void)
 {
+#ifdef WIN32
+    CreateDirectory("./log", NULL);
+#else
     mkdir("log", S_IRWXU);
+#endif
+
     log_file = fopen("./log/info.log", "w+");
     if (log_file != NULL)
     {
@@ -45,6 +56,15 @@ void close_log(void)
         log_is_open = false;
     }
 }
+
+FILE* get_log_file(void)
+{
+    if (log_is_open)
+    {
+        return log_file;
+    }
+    return NULL;
+}
 #endif
 
 
@@ -53,7 +73,12 @@ void _test(Error_type type_error, int condition, const char* str_condition, cons
 #ifndef NDEBUG
     if (log_is_open)
     {
-        fprintf(log_file, "[%s] : %s is %s  ---- %s line : %d, file %s\n", (!condition) ? error_str[type_error] : "Success", str_condition, (!condition) ? "true" : "false", (!condition) ? message : "", line, file);
+        fprintf(log_file, "[%s] : %s is %s  ---- %s line : %d, file %s\n", 
+                            (!condition) ? error_str[type_error] : "Success", 
+                            str_condition, 
+                            BOOL_ALPHA(condition), 
+                            (!condition) ? message : "", 
+                            line, file);
     }
 #else
     UNUSED(str_condition);
@@ -65,13 +90,4 @@ void _test(Error_type type_error, int condition, const char* str_condition, cons
     {
         exit(-1);
     }
-}
-
-FILE* get_log_file(void)
-{
-    if (log_is_open)
-    {
-        return log_file;
-    }
-    return NULL;
 }
