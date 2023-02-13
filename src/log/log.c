@@ -68,17 +68,17 @@ FILE* get_log_file(void)
 #endif
 
 
-void _test(Error_type type_error, int condition, const char* str_condition, const char* message, int line, const char* file)
+void _test(Error_type type_error, int condition, const char* str_condition, const char* message, int line, const char* func, const char* file)
 {
 #ifndef NDEBUG
     if (log_is_open)
     {
-        fprintf(log_file, "[%s] : %s is %s  ---- %s line : %d, file %s\n", 
+        fprintf(log_file, "[%s] : %s is %s  ---- %s %s:%d in function %s\n", 
                             (!condition) ? error_str[type_error] : "Success", 
                             str_condition, 
                             BOOL_ALPHA(condition), 
                             (!condition) ? message : "", 
-                            line, file);
+                            file, line, func);
     }
 #else
     UNUSED(str_condition);
@@ -88,6 +88,7 @@ void _test(Error_type type_error, int condition, const char* str_condition, cons
 #endif
     if (type_error == FATAL_ERROR && !condition)
     {
+        close_log();
         exit(-1);
     }
 }

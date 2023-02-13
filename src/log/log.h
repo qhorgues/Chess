@@ -13,8 +13,8 @@ typedef enum Error_type
     FATAL_ERROR = 3
 } Error_type;
 
-void _test(Error_type type_error, int condition, const char* str_condition, const char* message, int line, const char* file);
-#define test(type_error, condition, message) _test(type_error, condition, #condition, message, __LINE__, __FILE__)
+void _test(Error_type type_error, int condition, const char* str_condition, const char* message, int line, const char* func, const char* file);
+#define test(type_error, condition, message) _test(type_error, condition, #condition, message, __LINE__, __func__, __FILE__)
 #define DEFAULT_MESSAGE strerror(errno)
 
 
