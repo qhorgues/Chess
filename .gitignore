@@ -3,7 +3,6 @@
 
 # Object files
 *.o
-*.ico
 !/src/Icone/Icone.o
 *.rc
 *.ko
