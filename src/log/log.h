@@ -22,10 +22,12 @@ void _test(Error_type type_error, int condition, const char* str_condition, cons
     void open_log(void);
     void logged(Error_type type, const char* format, ...);
     void close_log(void);
+    FILE* get_log_file(void);
 #else
     #define open_log()
     #define logged(type, str, ...)
     #define close_log()
+    #define get_log_file() NULL;
 #endif
 
 #endif

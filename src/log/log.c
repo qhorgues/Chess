@@ -45,6 +45,15 @@ void close_log(void)
         log_is_open = false;
     }
 }
+
+FILE* get_log_file(void)
+{
+    if (log_is_open)
+    {
+        return log_file;
+    }
+    return NULL;
+}
 #endif
 
 
@@ -65,13 +74,4 @@ void _test(Error_type type_error, int condition, const char* str_condition, cons
     {
         exit(-1);
     }
-}
-
-FILE* get_log_file(void)
-{
-    if (log_is_open)
-    {
-        return log_file;
-    }
-    return NULL;
 }
