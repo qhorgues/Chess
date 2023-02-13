@@ -7,24 +7,25 @@
  * 
  * \~english example of use by testing an error :
  * @code
- * fprintf(stdout, "Hello World");
  * try
  * {
- * catch(ERROR_ILLEGUAL_BYTE_SEQUENCE): // In case a wide character code that does not match a valid character was detected
- * perror("fprintf");
- * break;
- * 
- * } endTry; // Exit the try IMPORTANT reset EXCEPTION to 0 with endTry;
+ *    fprintf(stdout, "Hello World");
+ * }
+ * first_catch (ERROR_ILLEGUAL_BYTE_SEQUENCE) // In case a wide character code that does not match a valid character was detected
+ * {
+ *    perror("fprintf"); * 
+ * } try_end
  * @endcode
  * \~english example by retrieving all the exceptions :
  * @code
- * fprintf(stdout, "Hello World");
  * try
  * {
- * catchAllExcept: // Catch all errors
- * perror("fprintf");
- * break;
- * } endTry;
+ *    fprintf(stdout, "Hello World");
+ * }
+ * first_catch (ERROR_ILLEGUAL_BYTE_SEQUENCE) // In case a wide character code that does not match a valid character was detected
+ * {
+ *    perror("fprintf"); * 
+ * } try_end
  * @endcode
  * \~english and here is a complete example:
  * @code 
@@ -33,28 +34,29 @@
  * 
  * void foo(int a)
  * {
- * if (a > 10)
- * {
- * throw(ERROR_INVALID_ARGUMENT, NO_VALUE); // throw an invalid argument exception
- * }
- * printf("%d\n", a);
- * returnExcept
- * // Code
+ *    if (a > 10)
+ *    {
+ *        throw(ERROR_INVALID_ARGUMENT, NO_VALUE); // throw an invalid argument exception
+ *    }
+ *    printf("%d\n", a);
+ *    returnExcept(NO_VALUE)
+ *    // Code
  * }
  * 
  * int main(void)
  * {
- * foo(12);
- * try
- * {
- * catch(ERROR_INVALID_ARGUMENT): // If the error is an invalid argument
- * perror("Error argument in function f");
- * break;
- * catchAllExcept: // If this is another error
- * perror("Error in function f");
- * break;
- * endTry;
- * return 0;
+ *    try
+ *    {
+ *        foo(12);
+ *    }
+ *    first_catch(ERROR_INVALID_ARGUMENT) // If the error is an invalid argument
+ *    {
+ *        perror("Error argument in function f");
+ *    catchAllExcept() // If this is another error
+ *    {
+ *        perror("Error in function f");
+ *    } try_end
+ *    return 0;
  * }
  * @endcode
  * 
@@ -70,24 +72,25 @@
  * 
  * \~french exemple d'utilistation en testant une erreur :
  * @code
- * fprintf(stdout, "Hello World");
  * try
  * {
- *     catch(ERROR_ILLEGUAL_BYTE_SEQUENCE): // Dans le cas d'un code de caractères larges qui ne correspond pas à un caractère valide a été détecté
- *          perror("fprintf");
- *          break;
- * 
- * } endTry; // On quitte le try IMPORTANT on réinitialise EXCEPTION à 0 avec endTry;
+ *    fprintf(stdout, "Hello World");
+ * }
+ * first_catch (ERROR_ILLEGUAL_BYTE_SEQUENCE) // In case a wide character code that does not match a valid character was detected
+ * {
+ *    perror("fprintf"); * 
+ * } try_end
  * @endcode
  * \~french exemple en recuperant toutes les exceptions :
  * @code
- * fprintf(stdout, "Hello World");
  * try
  * {
- *     catchAllExcept: // On recupere toutes les erreurs
- *          perror("fprintf");
- *          break;
- * } endTry;
+ *    fprintf(stdout, "Hello World");
+ * }
+ * first_catch (ERROR_ILLEGUAL_BYTE_SEQUENCE) // In case a wide character code that does not match a valid character was detected
+ * {
+ *    perror("fprintf"); * 
+ * } try_end
  * @endcode
  * \~french et voici un exemple complet :
  * @code 
@@ -96,28 +99,29 @@
  * 
  * void foo(int a)
  * {
- *     if (a > 10)
- *     {
- *         throw(ERROR_INVALID_ARGUMENT, NO_VALUE); // On lance une exception d'argument invalide
- *     }
- *     printf("%d\n", a);
- *     returnExcept
- *     // Code
+ *    if (a > 10)
+ *    {
+ *        throw(ERROR_INVALID_ARGUMENT, NO_VALUE); // throw an invalid argument exception
+ *    }
+ *    printf("%d\n", a);
+ *    returnExcept(NO_VALUE)
+ *    // Code
  * }
  * 
  * int main(void)
  * {
- *     foo(12);
- *     try
- *     {
- *         catch(ERROR_INVALID_ARGUMENT): // Si l'erreur est un argument invalide
- *             perror("Error argument in function f");
- *             break;
- *         catchAllExcept: // Si c'est une autre erreur
- *             perror("Error in function f");
- *             break;
- *     } endTry;
- *     return 0;
+ *    try
+ *    {
+ *        foo(12);
+ *    }
+ *    first_catch(ERROR_INVALID_ARGUMENT) // If the error is an invalid argument
+ *    {
+ *        perror("Error argument in function f");
+ *    catchAllExcept() // If this is another error
+ *    {
+ *        perror("Error in function f");
+ *    } try_end
+ *    return 0;
  * }
  * @endcode
  * 
@@ -153,22 +157,20 @@
  */
 #define NO_VALUE
 
-#define try if(EXCEPTION) { switch (EXCEPTION)
+#define try EXCEPTION = 0;
 
-#define catch case
+#define resetException() EXCEPTION = 0
 
-#define endTry    \
-    EXCEPTION = 0; \
-    }
+#define first_catch(except) \
+    if (EXCEPTION != NO_ERROR) \
+    {                          \
+        if (EXCEPTION == except)
 
-#define catchAllExcept default
+#define catch(except) else if (EXCEPTION == except)
 
-/**
- * @def no_try
- * \~english @brief If no test is performed, EXCEPTION is reset to 0
- * \~french @brief Si aucun teste n'est effectué on reinitialise EXCEPTION a 0
- */
-#define no_try EXCEPTION = 0
+#define catchAllExcept else
+
+#define try_end }
 
 /**
  * \~english @def returnExcept
