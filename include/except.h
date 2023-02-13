@@ -224,6 +224,7 @@
         }                           \
     }
 
+#define NO_ERROR 0
 #define ERROR_OPERATION_NOT_PERMITTED 1
 #define ERROR_NO_SUCH_FILE_OR_DIRECTORY 2
 #define ERROR_NO_SUCH_PROCESS 3
