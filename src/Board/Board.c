@@ -13,7 +13,8 @@
 #include <assert.h>
 #include <stdbool.h>
 #include "Board.h"
-#include "../include/except.h"
+#include "../../include/except.h"
+#include "../log/log.h"
 
 /**
  * \~english @def MAILBOX_64
@@ -401,10 +402,12 @@ int printBoard(struct Board const *board, FILE *out)
 	assert(out != NULL && "out cannot be NULL");
 	for (int i = 0; i < SIZE_BOARD; i++)
 	{
+		resetException();
 		fprintf(out, " %c%c ", playerColor(board->grid[i].color), (char)board->grid[i].type);
 		returnExcept(-1);
 		if ((i + 1) % 8 == 0)
 		{
+			resetException();
 			fputc('\n', out);
 			returnExcept(-1);
 		}
@@ -446,45 +449,93 @@ static void getPieceMove(struct Board const *board, ListMove *list, int const *t
 	assert(board != NULL && "board cannot be NULL");
 	assert(list != NULL && "list cannot be NULL");
 	assert(tabMove != NULL && "tabMove cannot be NULL");
+
 	for (int i = 0; i < sizeTabMove; i++)
 	{
 		int actu = board->mailbox_64[list->dpt] + tabMove[i];
 		while (board->mailbox_120[actu] != -1)
 		{
-			if (board->grid[board->mailbox_120[actu]].color == 0)
+			if (board->grid[board->mailbox_120[actu]].color == 0 || 
+				board->grid[board->mailbox_120[actu]].color == board->grid[list->dpt].color * -1)
 			{
-				ListMove_pushBack(list, board->mailbox_120[actu]);
-				try
-				{
-					catch (ERROR_NOT_ENOUGH_SPACE) : perror("In getPieceMove to the pushBack call");
-					ListMove_clear(list);
-					break;
-				catchAllExcept:
-					perror("In getPieceMove to the pushBack call");
-					break;
-				}
-				endTry;
+				test(FATAL_ERROR, ListMove_pushBack(list, board->mailbox_120[actu]) == 0, DEFAULT_MESSAGE);
+
 				actu += tabMove[i];
-			}
-			else if (board->grid[board->mailbox_120[actu]].color == board->grid[list->dpt].color * -1)
-			{
-				ListMove_pushBack(list, board->mailbox_120[actu]);
-				try
-				{
-					catch (ERROR_NOT_ENOUGH_SPACE) : perror("In getPieceMove to the pushBack call");
-					ListMove_clear(list);
-					break;
-				catchAllExcept:
-					perror("In getPieceMove to the pushBack call");
-					break;
-				}
-				endTry;
-				break;
 			}
 			else
 			{
 				break;
 			}
+		}
+	}
+}
+
+static void getMoveRook(struct Board const *board, ListMove *list)
+{
+	int const move_tower[4] = {-10, -1, 1, 10};
+	getPieceMove(board, list, move_tower, 4);
+}
+
+static void getMoveKnight(struct Board const *board, ListMove *list)
+{
+	int const move_knight[8] = {-21, -19, -12, -8, 8, 12, 19, 21};
+	for (int i = 0; i < 8; i++)
+	{
+		int const actu = board->mailbox_64[list->dpt] + move_knight[i];
+		if (board->mailbox_120[actu] != -1 && board->grid[board->mailbox_120[actu]].color != board->grid[list->dpt].color)
+		{
+			test(FATAL_ERROR, ListMove_pushBack(list, board->mailbox_120[actu]) == 0, DEFAULT_MESSAGE);
+		}
+	}
+}
+
+static void getMoveBishop(struct Board const *board, ListMove *list)
+{
+	int const move_bishop[4] = {-11, -9, 9, 11};
+	getPieceMove(board, list, move_bishop, 4);
+}
+
+static void getMoveQueen(struct Board const *board, ListMove *list)
+{
+	int const move_queen[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
+	getPieceMove(board, list, move_queen, 8);
+}
+
+static void getMoveKing(struct Board const *board, ListMove *list)
+{
+	int const move_king[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
+	for (int i = 0; i < 8; i++)
+	{
+		int const actu = board->mailbox_64[list->dpt] + move_king[i];
+		if (board->mailbox_120[actu] != -1 && board->grid[board->mailbox_120[actu]].color != board->grid[list->dpt].color)
+		{
+			test(FATAL_ERROR, ListMove_pushBack(list, board->mailbox_120[actu]) == 0, DEFAULT_MESSAGE);
+		}
+	}
+}
+static void getMovePawn(struct Board const *board, ListMove *list)
+{
+	int const color = board->grid[list->dpt].color;
+	int const dpt = board->mailbox_64[list->dpt];
+	int const advance = dpt + color * (-10);
+	int const eat[2] = {board->mailbox_64[list->dpt] + color * (-11), board->mailbox_64[list->dpt] + color * (-9)};
+	if (board->mailbox_120[advance] != -1 && board->grid[board->mailbox_120[advance]].color == 0)
+	{
+		ListMove_pushBack(list, board->mailbox_120[advance]);
+		if (board->grid[list->dpt].moved == false && board->grid[board->mailbox_120[advance + color * (-10)]].color == 0)
+		{
+			test(FATAL_ERROR, ListMove_pushBack(list, board->mailbox_120[eat[advance + color * (-10)]]) == 0, DEFAULT_MESSAGE);
+		}
+	}
+	for (int i = 0; i < 2; i++)
+	{
+		if (board->mailbox_120[eat[i]] != -1 && board->grid[board->mailbox_120[eat[i]]].color == color * -1)
+		{
+			test(FATAL_ERROR, ListMove_pushBack(list, board->mailbox_120[eat[i]]) == 0, DEFAULT_MESSAGE);
+		}
+		else if (board->mailbox_120[eat[i]] != -1 && board->grid[board->mailbox_120[eat[i]]].color == 0 && board->grid[board->mailbox_120[eat[i] + 10 * color]].prise_pass == true)
+		{
+			test(FATAL_ERROR, ListMove_pushBack(list, board->mailbox_120[eat[i]]) == 0, DEFAULT_MESSAGE);
 		}
 	}
 }
@@ -525,122 +576,26 @@ void ListMove_getMove(struct Board const *board, ListMove *list)
 	assert(list != NULL && "list cannot be NULL");
 	assert(list->dpt < SIZE_BOARD && "invalide coordinate list.dpt");
 	EXCEPTION = NO_ERROR;
+
 	switch (board->grid[list->dpt].type)
 	{
-	case Rook:;
-		int const move_tower[4] = {-10, -1, 1, 10};
-		getPieceMove(board, list, move_tower, 4);
+	case Rook:
+		getMoveRook(board, list);
 		break;
-	case Knight:;
-		int const move_knight[8] = {-21, -19, -12, -8, 8, 12, 19, 21};
-		for (int i = 0; i < 8; i++)
-		{
-			int const actu = board->mailbox_64[list->dpt] + move_knight[i];
-			if (board->mailbox_120[actu] != -1 && board->grid[board->mailbox_120[actu]].color != board->grid[list->dpt].color)
-			{
-				ListMove_pushBack(list, board->mailbox_120[actu]);
-				try
-				{
-					catch (ERROR_NOT_ENOUGH_SPACE) :;
-					perror("In ListMove_getMove to the pushBack call");
-					ListMove_clear(list);
-					return;
-				catchAllExcept:
-					perror("In ListMove_getMove to the pushBack call");
-					break;
-				}
-				endTry;
-			}
-		}
+	case Knight:
+		getMoveKnight(board, list);
 		break;
-	case Bishop:;
-		int const move_bishop[4] = {-11, -9, 9, 11};
-		getPieceMove(board, list, move_bishop, 4);
+	case Bishop:
+		getMoveBishop(board, list);
 		break;
-	case Queen:;
-		int const move_queen[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
-		getPieceMove(board, list, move_queen, 8);
+	case Queen:
+		getMoveQueen(board, list);
 		break;
-	case King:;
-		int const move_king[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
-		for (int i = 0; i < 8; i++)
-		{
-			int const actu = board->mailbox_64[list->dpt] + move_king[i];
-			if (board->mailbox_120[actu] != -1 && board->grid[board->mailbox_120[actu]].color != board->grid[list->dpt].color)
-			{
-				ListMove_pushBack(list, board->mailbox_120[actu]);
-				try
-				{
-					catch (ERROR_NOT_ENOUGH_SPACE) :;
-					perror("In ListMove_getMove to the pushBack call");
-					ListMove_clear(list);
-					return;
-				catchAllExcept:
-					perror("In ListMove_getMove to the pushBack call");
-					break;
-				}
-				endTry;
-			}
-		}
+	case King:
+		getMoveKing(board, list);
 		break;
-	case Pawn:;
-
-		int const color = board->grid[list->dpt].color;
-		int const dpt = board->mailbox_64[list->dpt];
-		int const advance = dpt + color * (-10);
-		int const eat[2] = {board->mailbox_64[list->dpt] + color * (-11), board->mailbox_64[list->dpt] + color * (-9)};
-		if (board->mailbox_120[advance] != -1 && board->grid[board->mailbox_120[advance]].color == 0)
-		{
-			ListMove_pushBack(list, board->mailbox_120[advance]);
-			if (board->grid[list->dpt].moved == false && board->grid[board->mailbox_120[advance + color * (-10)]].color == 0)
-			{
-				ListMove_pushBack(list, board->mailbox_120[advance + color * (-10)]);
-				try
-				{
-					catch (ERROR_NOT_ENOUGH_SPACE) :;
-					perror("In ListMove_getMove to the pushBack call");
-					ListMove_clear(list);
-					return;
-				catchAllExcept:
-					perror("In ListMove_getMove to the pushBack call");
-					break;
-				}
-				endTry;
-			}
-		}
-		for (int i = 0; i < 2; i++)
-		{
-			if (board->mailbox_120[eat[i]] != -1 && board->grid[board->mailbox_120[eat[i]]].color == color * -1)
-			{
-				ListMove_pushBack(list, board->mailbox_120[eat[i]]);
-				try
-				{
-					catch (ERROR_NOT_ENOUGH_SPACE) :;
-					perror("In ListMove_getMove to the pushBack call");
-					ListMove_clear(list);
-					return;
-				catchAllExcept:
-					perror("In ListMove_getMove to the pushBack call");
-					break;
-				}
-				endTry;
-			}
-			else if (board->mailbox_120[eat[i]] != -1 && board->grid[board->mailbox_120[eat[i]]].color == 0 && board->grid[board->mailbox_120[eat[i] + 10 * color]].prise_pass == true)
-			{
-				ListMove_pushBack(list, board->mailbox_120[eat[i]]);
-				try
-				{
-					catch (ERROR_NOT_ENOUGH_SPACE) :;
-					perror("In ListMove_getMove to the pushBack call");
-					ListMove_clear(list);
-					return;
-				catchAllExcept:
-					perror("In ListMove_getMove to the pushBack call");
-					break;
-				}
-				endTry;
-			}
-		}
+	case Pawn:
+		getMovePawn(board, list);
 		break;
 	case None:
 	default:
