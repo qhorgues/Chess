@@ -2,38 +2,45 @@
 function(set_target_warnings target)
     option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" TRUE)
     
-	option(ENEABLE_SANITIZER "Use sanitizer in Debug and RelWithDebInfo build type" TRUE)
+	if (NOT MINGW)
+		option(ENEABLE_SANITIZER "Use sanitizer in Debug and RelWithDebInfo build type" TRUE)
+		set(BUILD_DEBUG (${CMAKE_BUILD_TYPE} MATCHES "Debug") OR (${CMAKE_BUILD_TYPE} MATCHES "RelWithDebInfo" ) ) 
 
-    set(BUILD_DEBUG (${CMAKE_BUILD_TYPE} MATCHES "Debug") OR (${CMAKE_BUILD_TYPE} MATCHES "RelWithDebInfo" ) ) 
+		if (BUILD_DEBUG)
+			if (NOT MSVC)
+				set (CMAKE_C_FLAGS_DEBUG "-g -O2" CACHE INTERNAL "debug flags")
+			endif (NOT MSVC)
 
-    if (BUILD_DEBUG)
-        if (NOT MSVC)
-			set (CMAKE_C_FLAGS_DEBUG "-g -O2" CACHE INTERNAL "debug flags")
-        endif (NOT MSVC)
+			if (ENEABLE_SANITIZER)
+				if (MSVC)
+					set(SANITIZE /fsanitize=address /analyse)
+				else()
 
-		if (ENEABLE_SANITIZER)
-			if (MSVC)
-				set(SANITIZE /fsanitize=address /analyse)
-			else()
+					set(SANITIZE 
+						-fsanitize=address
+						-fsanitize=pointer-compare
+						-fsanitize=pointer-substract
+						-fsanitize=leak
+						-fsanitize=no-omit-frame-pointer
+						-fsanitize=undefined
+						-fsanitize=bounds-strict
+						-fsanitize=float-divide-by-zero
+						-fsanitize=float-cast-overflow
+						-fanalyser
+					)
 
-				set(SANITIZE 
-					-fsanitize=address
-					-fsanitize=pointer-compare
-					-fsanitize=pointer-substract
-					-fsanitize=leak
-					-fsanitize=no-omit-frame-pointer
-					-fsanitize=undefined
-					-fsanitize=bounds-strict
-					-fsanitize=float-divide-by-zero
-					-fsanitize=float-cast-overflow
-					-fanalyser
-				)
+					add_link_options(${SANITIZE})
+				endif (MSVC)
+			endif (ENEABLE_SANITIZER)
 
-				add_link_options(${SANITIZE})
-			endif (MSVC)
-		endif (ENEABLE_SANITIZER)
+		endif (BUILD_DEBUG)
+	else ()
+		add_link_options(-fstack-protector -lssp)
+	endif (NOT MINGW)
 
-    endif (BUILD_DEBUG)
+	if (NOT MINGW)
+		set (FORTIFY -D_FORTIFY_SOURCE=2 -fstack-protector-strong -fstack-clash-protection -fPIE)
+	endif (NOT MINGW)
 
     set (GCC_WARNINGS
 	    -Wall
@@ -69,10 +76,7 @@ function(set_target_warnings target)
 	    -Wstack-usage=1000000
 	    -Wcast-align=strict
 
-	    -D_FORTIFY_SOURCE=2
-	    -fstack-protector-strong
-	    -fstack-clash-protection
-	    -fPIE
+	    ${FORTIFY}
 
 	    -Wl,-z,relro
 	    -Wl,-z,now
@@ -110,11 +114,9 @@ function(set_target_warnings target)
 	    -Wthread-safety-beta
 	    -Wcomma
 	    
-	    -D_FORTIFY_SOURCES
-	    -fstack-protector-strong
+	    ${FORTIFY}
+
 	    -fsanitize=safe-stack
-	    -fPIE
-	    -fstack-clash-protection
 
 	    -Wl,-z,relro
 	    -Wl,-z,now
