@@ -259,7 +259,7 @@ struct Board initBoard(void)
  *
  *
  * WP WP WP WP WP WP WP WP
- * WR WN WB WK WB WN WR
+ * WR WN WB WK    WB WN WR
  * @endcode
  * \~english We see that the lady in D1 (3, 7) is moved to E8 (4, 0)
  *
